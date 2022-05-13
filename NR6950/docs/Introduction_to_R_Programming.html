@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Josh Carrell - Utah State University, MS Ecology" />
+
+
+<title>Introduction to R: Coding Guide</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">NR 6950: Geospatial Analysis for Natural Resources</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    R Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_R_Programming.html">Intro to R</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Wrangling.html">Intro to Data Wrangling</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Visualization.html">Intro to Data Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Geospatial Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_Geospatial_Data_Coordinate_Systems.html">Introduction to Coordinate Systems</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Vector_Data.html">Introduction to Spatial Vector Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Raster_Data.html">Introduction to Spatial Raster Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Remote_Sensing.html">Introduction to Remote Sensing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Advanced Geospatial Topics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Point_Pattern_Analysis.html">Point Pattern Analysis</a>
+    </li>
+    <li>
+      <a href="Burn_ratio.html">Remote Sensing: Difference Normalized Burn Ratio</a>
+    </li>
+    <li>
+      <a href="Species_Distribution_Modeling.html">Species Distribution Modeling</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Introduction to R: Coding Guide</h1>
+<h4 class="author">Josh Carrell - Utah State University, MS Ecology</h4>
+<h4 class="date">Last Update: May 13, 2022</h4>
+
+</div>
+
+
+<div id="welcome" class="section level1">
+<h1>Welcome!</h1>
+<p>You’ll find the basics of programming here. Too many times when I learn a programming language, I find myself wanting to run advanced data analysis before I know how to do the basics. No Longer! Crawl, Walk, Program.</p>
+<p>As it is titled, this is an introduction. You may already know the information here. If you feel confident in the material feel free to skip ahead and complete the assignment.</p>
+<p>If you do not feel very confident in R programming, please follow this guide and save an R script for your future reference.</p>
+<hr />
+<div id="how-to-use-this-guide" class="section level2">
+<h2>How to use this guide</h2>
+<ol style="list-style-type: decimal">
+<li><p>Open RStudio concurrently with this html guide.</p></li>
+<li><p>Type the code from the coding blocks (just press the “code” button) into an R script for your own personal practice.</p></li>
+</ol>
+<p>** You will not need to turn that personal script in. There is a separate assignment called “week 1 coding assignment” that you will turn in as an R script. **</p>
+<p>Let’s get started.</p>
+<hr />
+<div id="some-helpful-hints" class="section level3">
+<h3>some helpful hints:</h3>
+<ol style="list-style-type: decimal">
+<li><p>Learning R is easiest when you take the time and write out code in the console. Instead of just copy+paste the code from this guide, please write it out in R.</p></li>
+<li><p>Hastags are helpful ways to save hints or comments in your code. Simply put a # before anything you do not want run as code. This will allow you to annotate and leave computational breadcrumbs along the way. It is really easy to forget what you wrote in your code down the line, so best to remind yourself with a # comment.</p></li>
+</ol>
+<hr />
+</div>
+</div>
+<div id="data-types" class="section level2">
+<h2>Data Types</h2>
+<p>While programming in any language, you need to use variables to store information and data. Frequently used data storage types are the following:</p>
+<ul>
+<li><p>Vectors</p></li>
+<li><p>Lists</p></li>
+<li><p>Matrices</p></li>
+<li><p>Arrays</p></li>
+<li><p>Factors</p></li>
+<li><p>Data Frames</p></li>
+</ul>
+<div id="vectors" class="section level3">
+<h3>Vectors</h3>
+<p>A vector is the simplest type of data structure in R. Simply put, a vector is a sequence of data elements of the same basic type.These objects are made up of different classes. Below are the most important to know right now.</p>
+<div id="logical" class="section level4">
+<h4>Logical</h4>
+<p>Logical vectors are TRUE or FALSE or T or F. These are also known as <strong>Boolean</strong>. Think of logical vectors as light switch, it’s either on or off (in this case, True or False). Run the following code in your R script:</p>
+<pre class="r"><code>L &lt;- T
+class(L)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<pre class="r"><code>LL &lt;- FALSE
+class(LL)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+</div>
+<div id="doublenumeric" class="section level4">
+<h4>Double/Numeric</h4>
+<p>This one is easy. Double or Numeric vectors contain numbers. Could be 12, 5.8, or 13024.394. Run the following code in your R script:</p>
+<pre class="r"><code>N &lt;- 23
+class(N)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>print(N)</code></pre>
+<pre><code>## [1] 23</code></pre>
+<pre class="r"><code>NN &lt;- 45.84859
+class(NN)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+</div>
+<div id="integer" class="section level4">
+<h4>Integer</h4>
+<p>Integer can get confused with numeric. However, integers are numbers with the attached “L”. Run the following code in your R script:</p>
+<pre class="r"><code>I &lt;- 5L
+class(I)</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<pre class="r"><code>print(I)</code></pre>
+<pre><code>## [1] 5</code></pre>
+</div>
+<div id="complex" class="section level4">
+<h4>Complex</h4>
+<p>Complex contains real and imaginary numbers. We probably won’t be using these but it’s good to know. Run the following code in your R script:</p>
+<pre class="r"><code>C &lt;- 5 + 12i
+class(C)</code></pre>
+<pre><code>## [1] &quot;complex&quot;</code></pre>
+</div>
+<div id="character" class="section level4">
+<h4>Character</h4>
+<p>Simple, straightforward. Run the following code in your R script:</p>
+<pre class="r"><code>Char &lt;- &quot;Josh&quot;
+class(Char)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>sentence &lt;- &quot;This is a sentence&quot;
+class(sentence)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+</div>
+<div id="multiple-element-vectors" class="section level4">
+<h4>Multiple element vectors</h4>
+<p>Multiple element vectors are just as they sound. They contain multiple vectors. Run the following code in your R script:</p>
+<pre class="r"><code>mult &lt;- c(&quot;Hello&quot;, &quot;World&quot;)
+class(mult)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>print(mult)</code></pre>
+<pre><code>## [1] &quot;Hello&quot; &quot;World&quot;</code></pre>
+<pre class="r"><code>mult2 &lt;- c(5, 6, 6, 3, 23)
+class(mult2)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>print(mult2)</code></pre>
+<pre><code>## [1]  5  6  6  3 23</code></pre>
+</div>
+</div>
+<div id="lists" class="section level3">
+<h3>Lists</h3>
+<p>A List is an R-object which can contain many different types of elements inside it. Run the following code in your R script:</p>
+<pre class="r"><code>list1 &lt;- list(c(3, 4, 5, 6), &quot;Hello&quot;, c(&quot;This&quot;, &quot;is&quot;, &quot;fun&quot;))
+class(list1)</code></pre>
+<pre><code>## [1] &quot;list&quot;</code></pre>
+<pre class="r"><code>print(list1)</code></pre>
+<pre><code>## [[1]]
+## [1] 3 4 5 6
+## 
+## [[2]]
+## [1] &quot;Hello&quot;
+## 
+## [[3]]
+## [1] &quot;This&quot; &quot;is&quot;   &quot;fun&quot;</code></pre>
+</div>
+<div id="matrices" class="section level3">
+<h3>Matrices</h3>
+<p>A matrix is a two-dimensional rectangular data set. It can be created using a vector input to the matrix() function. It consists of columns and rows. specify dimensions by nrow = and ncol = and byrow =</p>
+<pre class="r"><code>matrix1 &lt;- matrix(c(3, 5, 7, 2, 4, 6, 1, 3, 5), nrow = 3, ncol = 3, byrow = T)
+matrix1</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    3    5    7
+## [2,]    2    4    6
+## [3,]    1    3    5</code></pre>
+<pre class="r"><code>m2 &lt;- matrix(c(&quot;Test 1&quot;, 88, &quot;Test 2&quot;, 92, &quot;Test 3&quot;, 76), 
+             nrow = 3, ncol = 2, byrow = T)
+m2</code></pre>
+<pre><code>##      [,1]     [,2]
+## [1,] &quot;Test 1&quot; &quot;88&quot;
+## [2,] &quot;Test 2&quot; &quot;92&quot;
+## [3,] &quot;Test 3&quot; &quot;76&quot;</code></pre>
+<pre class="r"><code># you can even do analysis with list elements
+## average test scores
+x &lt;- as.numeric(m2[4:6])
+sum(x)/3</code></pre>
+<pre><code>## [1] 85.33333</code></pre>
+</div>
+<div id="arrays" class="section level3">
+<h3>Arrays</h3>
+<p>Matrices are confined to 2 dimensions, but arrays can be any number of dimensions. The number of arrays produces a different possible order scenario.</p>
+<pre class="r"><code>#           # what goes in array      # dimensions. 3x3, 2 arrays
+A1 &lt;- array(c(&quot;One&quot;, &quot;Two&quot;), dim = c(3, 3, 2))
+A1</code></pre>
+<pre><code>## , , 1
+## 
+##      [,1]  [,2]  [,3] 
+## [1,] &quot;One&quot; &quot;Two&quot; &quot;One&quot;
+## [2,] &quot;Two&quot; &quot;One&quot; &quot;Two&quot;
+## [3,] &quot;One&quot; &quot;Two&quot; &quot;One&quot;
+## 
+## , , 2
+## 
+##      [,1]  [,2]  [,3] 
+## [1,] &quot;Two&quot; &quot;One&quot; &quot;Two&quot;
+## [2,] &quot;One&quot; &quot;Two&quot; &quot;One&quot;
+## [3,] &quot;Two&quot; &quot;One&quot; &quot;Two&quot;</code></pre>
+</div>
+<div id="factors" class="section level3">
+<h3>Factors</h3>
+<p>Factors are r-objects created using a vector. It stores the vector along with the distinct values of the elements in the vector as labels. Labels are always character irrespective of whether it is numeric or character or boolean. Useful in statistical modeling.</p>
+<pre class="r"><code># Create a vector
+colors &lt;- c(&quot;Blue&quot;, &quot;Green&quot;, &quot;Orange&quot;, &quot;Blue&quot;, &quot;Blue&quot;, &quot;Orange&quot;, &quot;Green&quot;)
+
+# create a factor object
+factor_colors &lt;- factor(colors)
+
+# print factor / Checks which unique objects are there and how many
+factor_colors</code></pre>
+<pre><code>## [1] Blue   Green  Orange Blue   Blue   Orange Green 
+## Levels: Blue Green Orange</code></pre>
+<pre class="r"><code>print(nlevels(factor_colors))</code></pre>
+<pre><code>## [1] 3</code></pre>
+</div>
+<div id="data-frames" class="section level3">
+<h3>Data Frames</h3>
+<p>Literally the best. Data Frames are tabular data objects with headers, columns, rows.</p>
+<pre class="r"><code>Info &lt;- data.frame(
+  Name = c(&quot;Steve&quot;, &quot;Tim&quot;, &quot;Tyrone&quot;),
+  Age = c(44, 48, 37),
+  Occupation = c(&quot;Nurse&quot;, &quot;Accountant&quot;, &quot;Police Officer&quot;),
+  Height.inches = c(72, 63, 74)
+)
+Info # notice under each header, the class is specified</code></pre>
+<pre><code>##     Name Age     Occupation Height.inches
+## 1  Steve  44          Nurse            72
+## 2    Tim  48     Accountant            63
+## 3 Tyrone  37 Police Officer            74</code></pre>
+<p>First, install</p>
+<p>You can also make a data frame from individual vectors using the data.frame() function.</p>
+<pre class="r"><code>test &lt;- c(1, 2, 3)
+score &lt;- c(88, 68, 92)
+name &lt;- c(&quot;Liz&quot;, &quot;Jessica&quot;, &quot;Rhonda&quot;)
+
+results &lt;- data.frame(test, score, name)
+results</code></pre>
+<pre><code>##   test score    name
+## 1    1    88     Liz
+## 2    2    68 Jessica
+## 3    3    92  Rhonda</code></pre>
+</div>
+</div>
+<div id="variables" class="section level2">
+<h2>Variables</h2>
+<p>a variable is a name by which data is stored.</p>
+<div id="some-rules" class="section level3">
+<h3>Some rules</h3>
+<pre class="r"><code>Variable.Name &lt;- c(&quot;var_name2.&quot;, &quot;var_name%&quot;, &quot;2var_name&quot;,
+                   &quot;var_name or var.name&quot;, &quot;.2var_name&quot;,
+                   &quot;_var_name&quot;)
+Validity &lt;- c(&quot;Valid&quot;, &quot;Invalid&quot;, &quot;Invalid&quot;, &quot;Valid&quot;, 
+              &quot;Invalid&quot;, &quot;Invalid&quot;)
+Reason &lt;- c(&quot;Has letters, numbers, dot and underscore.&quot;,
+            &quot;Has the caharcter &#39;%&#39;. only dot(.) and underscore are allowed&quot;,
+            &quot;Starts with a number&quot;,
+            &quot;Can start with a dot(.) but the dot(.) should not be followed by a number&quot;,
+            &quot;The starting dot is followed by a number making it invalid&quot;,
+            &quot;Starts with _, which is invalid&quot;)
+rules &lt;- data.frame(Variable.Name, Validity, Reason)
+library(pander)
+pander(rules)</code></pre>
+<table style="width:92%;">
+<colgroup>
+<col width="31%" />
+<col width="15%" />
+<col width="44%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Variable.Name</th>
+<th align="center">Validity</th>
+<th align="center">Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">var_name2.</td>
+<td align="center">Valid</td>
+<td align="center">Has letters, numbers, dot and underscore.</td>
+</tr>
+<tr class="even">
+<td align="center">var_name%</td>
+<td align="center">Invalid</td>
+<td align="center">Has the caharcter ‘%’. only dot(.) and underscore are allowed</td>
+</tr>
+<tr class="odd">
+<td align="center">2var_name</td>
+<td align="center">Invalid</td>
+<td align="center">Starts with a number</td>
+</tr>
+<tr class="even">
+<td align="center">var_name or var.name</td>
+<td align="center">Valid</td>
+<td align="center">Can start with a dot(.) but the dot(.) should not be followed by a number</td>
+</tr>
+<tr class="odd">
+<td align="center">.2var_name</td>
+<td align="center">Invalid</td>
+<td align="center">The starting dot is followed by a number making it invalid</td>
+</tr>
+<tr class="even">
+<td align="center">_var_name</td>
+<td align="center">Invalid</td>
+<td align="center">Starts with _, which is invalid</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># view all the current variables assigned in the environment
+print(ls())</code></pre>
+<pre><code>##  [1] &quot;A1&quot;            &quot;badass&quot;        &quot;C&quot;             &quot;Char&quot;         
+##  [5] &quot;Colorado&quot;      &quot;colors&quot;        &quot;Counties&quot;      &quot;factor_colors&quot;
+##  [9] &quot;fires&quot;         &quot;G&quot;             &quot;geo&quot;           &quot;i&quot;            
+## [13] &quot;I&quot;             &quot;Info&quot;          &quot;iris_new&quot;      &quot;iris_select&quot;  
+## [17] &quot;jumps&quot;         &quot;L&quot;             &quot;list1&quot;         &quot;LL&quot;           
+## [21] &quot;m2&quot;            &quot;matrix1&quot;       &quot;mesa&quot;          &quot;mult&quot;         
+## [25] &quot;mult2&quot;         &quot;N&quot;             &quot;name&quot;          &quot;nbr_post&quot;     
+## [29] &quot;nbr_pre&quot;       &quot;ndbi&quot;          &quot;ndbi_class&quot;    &quot;ndbi_R&quot;       
+## [33] &quot;NN&quot;            &quot;numbers&quot;       &quot;PG&quot;            &quot;PG_post&quot;      
+## [37] &quot;PG_postC&quot;      &quot;PG_pre&quot;        &quot;PG_preC&quot;       &quot;PG_v&quot;         
+## [41] &quot;post_2&quot;        &quot;post_3&quot;        &quot;post_4&quot;        &quot;post_5&quot;       
+## [45] &quot;post_7&quot;        &quot;post_nat&quot;      &quot;pre_2&quot;         &quot;pre_3&quot;        
+## [49] &quot;pre_4&quot;         &quot;pre_5&quot;         &quot;pre_7&quot;         &quot;pre_nat&quot;      
+## [53] &quot;Reason&quot;        &quot;results&quot;       &quot;rules&quot;         &quot;score&quot;        
+## [57] &quot;sentence&quot;      &quot;setosa_small&quot;  &quot;states&quot;        &quot;survey&quot;       
+## [61] &quot;test&quot;          &quot;Validity&quot;      &quot;Variable.Name&quot; &quot;was_it&quot;       
+## [65] &quot;x&quot;             &quot;x1&quot;            &quot;x2&quot;</code></pre>
+</div>
+</div>
+<div id="operators" class="section level2">
+<h2>Operators</h2>
+<p>An operator is a symbol that tells the compiler to perform specific mathematical or logical manipulations.</p>
+<p>Types of Operators:</p>
+<ul>
+<li><p>Arithmetic</p></li>
+<li><p>Relational</p></li>
+<li><p>Logical</p></li>
+<li><p>Assignment</p></li>
+<li><p>Miscellaneous</p></li>
+</ul>
+<div id="arithmetic-operators" class="section level3">
+<h3>Arithmetic Operators</h3>
+<div id="addition" class="section level4">
+<h4>Addition</h4>
+<pre class="r"><code>#  + (adds two vectors)
+
+v1 &lt;- c(5, 4, 6, 8)
+r1 &lt;- c(4, 2, 6, 9)
+v1 + r1</code></pre>
+<pre><code>## [1]  9  6 12 17</code></pre>
+</div>
+<div id="subtraction" class="section level4">
+<h4>Subtraction</h4>
+<pre class="r"><code>#  - (subtracts vector from first)
+v1-r1</code></pre>
+<pre><code>## [1]  1  2  0 -1</code></pre>
+</div>
+<div id="multiplication" class="section level4">
+<h4>Multiplication</h4>
+<pre class="r"><code>#  * (multiplies the vectors)
+v1 * r1</code></pre>
+<pre><code>## [1] 20  8 36 72</code></pre>
+</div>
+<div id="division" class="section level4">
+<h4>Division</h4>
+<pre class="r"><code>#  / (Divides first vector by second)
+v1 / r1</code></pre>
+<pre><code>## [1] 1.2500000 2.0000000 1.0000000 0.8888889</code></pre>
+</div>
+</div>
+</div>
+<div id="writing-functions" class="section level2">
+<h2>Writing Functions</h2>
+<p>Creating a function saves time on a repeated process.</p>
+<p>Below is an example template for a function:</p>
+<p>function_name &lt;- function(argument1, argument2) { # document your function here # what the function does # function inputs and outputs some_calculated_output &lt;- (argument1 + argument2) return(some_calculated_output) }</p>
+<div id="developing-a-function-for-fahrenheit-to-kelvin" class="section level3">
+<h3>Developing a Function for Fahrenheit to Kelvin</h3>
+<p>Most computing can be done manually as shown below. However, if you develop a function, you can compute quicker. Plus its cool.</p>
+<pre class="r"><code># assign a fahrenheit temp
+temp_f &lt;- 5
+
+# calculate kelvin
+((temp_f - 32) * (5/9)) + 273.15</code></pre>
+<pre><code>## [1] 258.15</code></pre>
+<pre class="r"><code># Create a F to K function
+
+fahr_to_kelvin &lt;- function(fahr) {
+  # function that converts temperature in degrees Fahrenheit to kelvin
+  # input: fahr: numeric value representing temp in degrees farh
+  # output: kelvin: numeric converted temp in kelvin
+  kelvin &lt;- ((fahr - 32) * (5 / 9)) + 273.15
+  return(kelvin)
+}</code></pre>
+<pre class="r"><code># Test the function
+
+fahr_to_kelvin(5)</code></pre>
+<pre><code>## [1] 258.15</code></pre>
+</div>
+<div id="test-write-a-function-to-compute-number-of-hours-lived-by-entering-years" class="section level3">
+<h3>Test: Write a function to compute number of hours lived by entering years</h3>
+<pre class="r"><code>years_to_hours &lt;- function(years) {
+  # function that converts years to hours lived
+  # input: years: numeric value of how many years you&#39;ve lived
+  # output: hours: numeric value of how many hours you have lived
+  hours &lt;- ((years * 365) * 24)
+  return(hours)
+}</code></pre>
+<pre class="r"><code>years_to_hours(28)</code></pre>
+<pre><code>## [1] 245280</code></pre>
+</div>
+<div id="test-2-function-for-circumference" class="section level3">
+<h3>Test 2: Function for Circumference</h3>
+<pre class="r"><code>Circumference_from_Radius &lt;- function(radius) {
+  # function that calculates circumference from radius
+  # input: radius
+  # output: circumference
+  circumference &lt;- ((2 * 3.1415) * radius)
+  return(circumference)
+}</code></pre>
+<pre class="r"><code>Circumference_from_Radius(8)</code></pre>
+<pre><code>## [1] 50.264</code></pre>
+</div>
+</div>
+<div id="installing-packages" class="section level2">
+<h2>Installing packages</h2>
+<p>We will be using functions and pre-built code through what are called packages. Developers create packages to make our lives much easier. It’s a pretty simple process:</p>
+<ol style="list-style-type: decimal">
+<li><p>If you have never before used the package, install it by using the function: install.packages()</p></li>
+<li><p>Inside the (), put the package name in “quotations”.</p></li>
+<li><p>Once the package is installed, load the package into usage by using the function: library()</p></li>
+<li><p>Inside the (), put the name of the package.</p></li>
+</ol>
+<p>Lets install a very common plotting package, ggplot2.</p>
+<pre class="r"><code># install.packages(&quot;ggplot2&quot;) # make sure there isn&#39;t a hashtag before this code!
+library(ggplot2)</code></pre>
+<p>If you are new to plotting in R, let’s make a quick plot using the ggplot2 package we just created. We will also be using the built-in dataset: iris. For now, this is just for fun, we will cover plotting and data visualization later this semester. Run the following code in your R script:</p>
+<pre class="r"><code>ggplot(iris, aes(x = Sepal.Width, y = Sepal.Length, col = Species)) +
+  geom_point() +
+  geom_density2d()</code></pre>
+<p><img src="Introduction_to_R_Programming_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+</div>
+<div id="save-your-script" class="section level2">
+<h2>Save your script</h2>
+<p>If you followed along in your own R script, go to File &gt; Save. Save the script in your NR 6950 folder as introduction_to_r_programming.R</p>
+<div id="complete" class="section level4">
+<h4>Complete</h4>
+<p>For now, these are just some basics you need to know how to do. You may forget them so please refer back to either this document or your own annotated R script.</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

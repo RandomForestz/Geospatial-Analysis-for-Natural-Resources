@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Josh Carrell - Utah State University, MS Ecology" />
+
+
+<title>Introduction to Spatial Vector Data Using the sf Package</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">NR 6950: Geospatial Analysis for Natural Resources</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    R Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_R_Programming.html">Intro to R</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Wrangling.html">Intro to Data Wrangling</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Visualization.html">Intro to Data Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Geospatial Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_Geospatial_Data_Coordinate_Systems.html">Introduction to Coordinate Systems</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Vector_Data.html">Introduction to Spatial Vector Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Raster_Data.html">Introduction to Spatial Raster Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Remote_Sensing.html">Introduction to Remote Sensing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Advanced Geospatial Topics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Point_Pattern_Analysis.html">Point Pattern Analysis</a>
+    </li>
+    <li>
+      <a href="Burn_ratio.html">Remote Sensing: Difference Normalized Burn Ratio</a>
+    </li>
+    <li>
+      <a href="Species_Distribution_Modeling.html">Species Distribution Modeling</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Introduction to Spatial Vector Data Using the sf Package</h1>
+<h4 class="author">Josh Carrell - Utah State University, MS Ecology</h4>
+<h4 class="date">Last Update: May 13, 2022</h4>
+
+</div>
+
+
+<div id="spatial-vector-data" class="section level2">
+<h2>Spatial Vector Data</h2>
+<p>As you remember from the Week 4 lecture guide, spatial vector data are discrete datasets in the form of points, lines, and polygons.</p>
+<p><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/plpz.png" /></p>
+<p>Points are locations in space defined by a set of coordinates (x,y). Lines are derived from the connection of at least 2 points (called nodes). Polygons are created through the connection of lines that encapsulate an area.</p>
+<hr />
+<div id="shapefiles" class="section level3">
+<h3>Shapefiles</h3>
+<p>The common vector data type is the shapefile (.shp). Shapefiles contains a few other data like a projection file that contains our coordinate system (.prj), tabular information describing the characteristics of the spatial data (.dbf) and a few others.</p>
+<p>Shapefiles are not the only vector data type you can work with but as for this class, We will be working with shapefiles.</p>
+<hr />
+</div>
+</div>
+<div id="sf" class="section level2">
+<h2>sf</h2>
+<p>Straight from the horses mouth,</p>
+<p><em>“Simple features or simple feature access refers to a formal standard (ISO 19125-1:2004) that describes how objects in the real world can be represented in computers, with emphasis on the spatial geometry of these objects. It also describes how such objects can be stored in and retrieved from databases, and which geometrical operations should be defined for them”.</em> - sf package documentation</p>
+<p>Basically, sf is a package that allows us to upload, organize, manipulate, analyze, and visualize spatial data.</p>
+<ul>
+<li>Most sf functions start with <strong>“st_”</strong>.</li>
+</ul>
+<p>In this coding guide, we will use a case study and introduce 20 (that’s right, 20!) sf functions. There are more sf funtions out there, but these 20 will get you on the right track for working with spatial vector data.</p>
+<hr />
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>Our data for this guide will focus on the 4 corners area of the United States. We will be using the following:</p>
+<ul>
+<li><p>Points: Occurrences (either viewed locations or collected specimen) of Mule Deer.</p></li>
+<li><p>Lines: Major Highways of the United States</p></li>
+<li><p>Polygons: States of the United States &amp; Counties of 4 corners states</p></li>
+</ul>
+<hr />
+</div>
+<div id="objectives" class="section level2">
+<h2>Objectives:</h2>
+<p>The purpose of this coding guide is to show you practical examples of using sf and it’s many functions. We’re covering around 20 functions here. It’s more than enough to get started and to start thinking about how you want to work with spatial vector data.</p>
+<hr />
+<div id="libraries" class="section level3">
+<h3>libraries</h3>
+<p>Install (if you haven’t already - you should have by now!) and load the following packages:</p>
+<ul>
+<li><p>sf</p></li>
+<li><p>tidyverse</p></li>
+</ul>
+<pre class="r"><code>library(sf)
+library(tidyverse)</code></pre>
+<hr />
+</div>
+</div>
+<div id="sf-functions" class="section level2">
+<h2>sf functions</h2>
+<div id="st_read" class="section level3">
+<h3>st_read()</h3>
+<p>st_read() is the function for loading shapefiles into R. Lets load in the following shapefiles found in the Week 4 data folder on Canvas:</p>
+<ul>
+<li><p>United States Counties (tl_2021_us_county.shp)</p></li>
+<li><p>United States States (states.shp)</p></li>
+<li><p>United States Major Highways (tl_2017_us_primaryroads.shp)</p></li>
+</ul>
+<hr />
+<p>NOTE: You’ll notice a few characteristics of the data pop up when loading in a shapefile (same thing for a raster):</p>
+<ul>
+<li><p>Shapefile Name</p></li>
+<li><p>Simple feature with x features and x fields (# of rows by # of columns)</p></li>
+<li><p>Geometry type (Point, line, or polygon)</p></li>
+<li><p>Dimension (spatial, it requires x,y coordinates)</p></li>
+<li><p>Bounding box (the larger extent around the data)</p></li>
+<li><p>Geodetic CRS (Which coordinate system is currently assigned to the data)</p></li>
+</ul>
+<hr />
+<pre class="r"><code># US counties
+counties &lt;- st_read(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/sf_datasets/tl_2021_us_county.shp&quot;)</code></pre>
+<pre><code>## Reading layer `tl_2021_us_county&#39; from data source 
+##   `D:\R Textbook Template\NR6950 Notebook\NR 6950 Notebook\Data\sf_datasets\tl_2021_us_county.shp&#39; 
+##   using driver `ESRI Shapefile&#39;
+## Simple feature collection with 3234 features and 17 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -179.2311 ymin: -14.60181 xmax: 179.8597 ymax: 71.43979
+## Geodetic CRS:  NAD83</code></pre>
+<pre class="r"><code># US States
+states &lt;- st_read(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/sf_datasets/state.shp&quot;)</code></pre>
+<pre><code>## Reading layer `state&#39; from data source 
+##   `D:\R Textbook Template\NR6950 Notebook\NR 6950 Notebook\Data\sf_datasets\state.shp&#39; 
+##   using driver `ESRI Shapefile&#39;
+## Simple feature collection with 56 features and 4 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -179.1686 ymin: -14.59976 xmax: 179.7487 ymax: 71.38961
+## Geodetic CRS:  WGS 84</code></pre>
+<pre class="r"><code># Roads
+roads &lt;- st_read(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/sf_datasets/tl_2017_us_primaryroads.shp&quot;)</code></pre>
+<pre><code>## Reading layer `tl_2017_us_primaryroads&#39; from data source 
+##   `D:\R Textbook Template\NR6950 Notebook\NR 6950 Notebook\Data\sf_datasets\tl_2017_us_primaryroads.shp&#39; 
+##   using driver `ESRI Shapefile&#39;
+## Simple feature collection with 11574 features and 4 fields
+## Geometry type: LINESTRING
+## Dimension:     XY
+## Bounding box:  xmin: -158.1042 ymin: 17.98217 xmax: -65.64866 ymax: 49.00209
+## Geodetic CRS:  NAD83</code></pre>
+<hr />
+<div id="examine" class="section level4">
+<h4>Examine</h4>
+<p>Below are a few common functions that I use to examine my data. They are not from the sf packge but they are very useful.</p>
+<p>Check out the code and the outputs below!</p>
+<pre class="r"><code>str(counties) # data structure</code></pre>
+<pre><code>## Classes &#39;sf&#39; and &#39;data.frame&#39;:   3234 obs. of  18 variables:
+##  $ STATEFP : chr  &quot;31&quot; &quot;53&quot; &quot;35&quot; &quot;31&quot; ...
+##  $ COUNTYFP: chr  &quot;039&quot; &quot;069&quot; &quot;011&quot; &quot;109&quot; ...
+##  $ COUNTYNS: chr  &quot;00835841&quot; &quot;01513275&quot; &quot;00933054&quot; &quot;00835876&quot; ...
+##  $ GEOID   : chr  &quot;31039&quot; &quot;53069&quot; &quot;35011&quot; &quot;31109&quot; ...
+##  $ NAME    : chr  &quot;Cuming&quot; &quot;Wahkiakum&quot; &quot;De Baca&quot; &quot;Lancaster&quot; ...
+##  $ NAMELSAD: chr  &quot;Cuming County&quot; &quot;Wahkiakum County&quot; &quot;De Baca County&quot; &quot;Lancaster County&quot; ...
+##  $ LSAD    : chr  &quot;06&quot; &quot;06&quot; &quot;06&quot; &quot;06&quot; ...
+##  $ CLASSFP : chr  &quot;H1&quot; &quot;H1&quot; &quot;H1&quot; &quot;H1&quot; ...
+##  $ MTFCC   : chr  &quot;G4020&quot; &quot;G4020&quot; &quot;G4020&quot; &quot;G4020&quot; ...
+##  $ CSAFP   : chr  NA NA NA &quot;339&quot; ...
+##  $ CBSAFP  : chr  NA NA NA &quot;30700&quot; ...
+##  $ METDIVFP: chr  NA NA NA NA ...
+##  $ FUNCSTAT: chr  &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; ...
+##  $ ALAND   : num  1.48e+09 6.81e+08 6.02e+09 2.17e+09 1.49e+09 ...
+##  $ AWATER  : num  10690204 61568965 29090018 22847034 1718484 ...
+##  $ INTPTLAT: chr  &quot;+41.9158651&quot; &quot;+46.2946377&quot; &quot;+34.3592729&quot; &quot;+40.7835474&quot; ...
+##  $ INTPTLON: chr  &quot;-096.7885168&quot; &quot;-123.4244583&quot; &quot;-104.3686961&quot; &quot;-096.6886584&quot; ...
+##  $ geometry:sfc_MULTIPOLYGON of length 3234; first list element: List of 1
+##   ..$ :List of 1
+##   .. ..$ : num [1:1351, 1:2] -96.6 -96.6 -96.6 -96.6 -96.6 ...
+##   ..- attr(*, &quot;class&quot;)= chr [1:3] &quot;XY&quot; &quot;MULTIPOLYGON&quot; &quot;sfg&quot;
+##  - attr(*, &quot;sf_column&quot;)= chr &quot;geometry&quot;
+##  - attr(*, &quot;agr&quot;)= Factor w/ 3 levels &quot;constant&quot;,&quot;aggregate&quot;,..: NA NA NA NA NA NA NA NA NA NA ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:17] &quot;STATEFP&quot; &quot;COUNTYFP&quot; &quot;COUNTYNS&quot; &quot;GEOID&quot; ...</code></pre>
+<pre class="r"><code>dim(counties) # data dimensions</code></pre>
+<pre><code>## [1] 3234   18</code></pre>
+<pre class="r"><code>head(counties, 2) # quick view</code></pre>
+<pre><code>## Simple feature collection with 2 features and 17 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -123.7283 ymin: 41.74202 xmax: -96.55486 ymax: 46.38562
+## Geodetic CRS:  NAD83
+##   STATEFP COUNTYFP COUNTYNS GEOID      NAME         NAMELSAD LSAD CLASSFP MTFCC
+## 1      31      039 00835841 31039    Cuming    Cuming County   06      H1 G4020
+## 2      53      069 01513275 53069 Wahkiakum Wahkiakum County   06      H1 G4020
+##   CSAFP CBSAFP METDIVFP FUNCSTAT      ALAND   AWATER    INTPTLAT     INTPTLON
+## 1  &lt;NA&gt;   &lt;NA&gt;     &lt;NA&gt;        A 1477645345 10690204 +41.9158651 -096.7885168
+## 2  &lt;NA&gt;   &lt;NA&gt;     &lt;NA&gt;        A  680976231 61568965 +46.2946377 -123.4244583
+##                         geometry
+## 1 MULTIPOLYGON (((-96.55515 4...
+## 2 MULTIPOLYGON (((-123.4908 4...</code></pre>
+<pre class="r"><code>names(counties) # column names</code></pre>
+<pre><code>##  [1] &quot;STATEFP&quot;  &quot;COUNTYFP&quot; &quot;COUNTYNS&quot; &quot;GEOID&quot;    &quot;NAME&quot;     &quot;NAMELSAD&quot;
+##  [7] &quot;LSAD&quot;     &quot;CLASSFP&quot;  &quot;MTFCC&quot;    &quot;CSAFP&quot;    &quot;CBSAFP&quot;   &quot;METDIVFP&quot;
+## [13] &quot;FUNCSTAT&quot; &quot;ALAND&quot;    &quot;AWATER&quot;   &quot;INTPTLAT&quot; &quot;INTPTLON&quot; &quot;geometry&quot;</code></pre>
+<pre class="r"><code>class(counties) # What is it?</code></pre>
+<pre><code>## [1] &quot;sf&quot;         &quot;data.frame&quot;</code></pre>
+<hr />
+</div>
+</div>
+<div id="st_crs" class="section level3">
+<h3>st_crs()</h3>
+<p>As we learned in the lecture guide, the geographic coordinate systems assigned to the data makes a big difference in how we visualize our data. There is another important aspect of geographic coordinate systems:</p>
+<p><strong>For spatial data to be mapped properly in R, all data must be in the same CRS</strong>.</p>
+<p>R doesn’t automatically reproject your data for you (ESRI ArcGIS Products do). We need to check the CRS of each data and transform them to match our desired coordinate system.</p>
+<p>You can check the coordinate system by using the function, <strong>st_crs()</strong>. Warning, the full CRS name will print… it gets overwhelming to look at. Helpful things to point out are the Datum name (near the top) and the EPSG code (near the bottom).</p>
+<p>Check out the code and outputs below:</p>
+<pre class="r"><code>st_crs(counties)</code></pre>
+<pre><code>## Coordinate Reference System:
+##   User input: NAD83 
+##   wkt:
+## GEOGCRS[&quot;NAD83&quot;,
+##     DATUM[&quot;North American Datum 1983&quot;,
+##         ELLIPSOID[&quot;GRS 1980&quot;,6378137,298.257222101,
+##             LENGTHUNIT[&quot;metre&quot;,1]]],
+##     PRIMEM[&quot;Greenwich&quot;,0,
+##         ANGLEUNIT[&quot;degree&quot;,0.0174532925199433]],
+##     CS[ellipsoidal,2],
+##         AXIS[&quot;latitude&quot;,north,
+##             ORDER[1],
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433]],
+##         AXIS[&quot;longitude&quot;,east,
+##             ORDER[2],
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433]],
+##     ID[&quot;EPSG&quot;,4269]]</code></pre>
+<pre class="r"><code>st_crs(states)</code></pre>
+<pre><code>## Coordinate Reference System:
+##   User input: WGS 84 
+##   wkt:
+## GEOGCRS[&quot;WGS 84&quot;,
+##     DATUM[&quot;World Geodetic System 1984&quot;,
+##         ELLIPSOID[&quot;WGS 84&quot;,6378137,298.257223563,
+##             LENGTHUNIT[&quot;metre&quot;,1]]],
+##     PRIMEM[&quot;Greenwich&quot;,0,
+##         ANGLEUNIT[&quot;degree&quot;,0.0174532925199433]],
+##     CS[ellipsoidal,2],
+##         AXIS[&quot;latitude&quot;,north,
+##             ORDER[1],
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433]],
+##         AXIS[&quot;longitude&quot;,east,
+##             ORDER[2],
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433]],
+##     ID[&quot;EPSG&quot;,4326]]</code></pre>
+<pre class="r"><code>st_crs(roads)</code></pre>
+<pre><code>## Coordinate Reference System:
+##   User input: NAD83 
+##   wkt:
+## GEOGCRS[&quot;NAD83&quot;,
+##     DATUM[&quot;North American Datum 1983&quot;,
+##         ELLIPSOID[&quot;GRS 1980&quot;,6378137,298.257222101,
+##             LENGTHUNIT[&quot;metre&quot;,1]]],
+##     PRIMEM[&quot;Greenwich&quot;,0,
+##         ANGLEUNIT[&quot;degree&quot;,0.0174532925199433]],
+##     CS[ellipsoidal,2],
+##         AXIS[&quot;latitude&quot;,north,
+##             ORDER[1],
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433]],
+##         AXIS[&quot;longitude&quot;,east,
+##             ORDER[2],
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433]],
+##     ID[&quot;EPSG&quot;,4269]]</code></pre>
+<hr />
+<div id="crs-crs" class="section level4">
+<h4>CRS == CRS?</h4>
+<p>You can even run the function and check to see if the CRS of 2 different data are the same:</p>
+<pre class="r"><code>st_crs(counties) == st_crs(states) # You must use 2 equal signs, ==</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code># reponse will be T or F</code></pre>
+<hr />
+</div>
+</div>
+<div id="st_transform" class="section level3">
+<h3>st_transform()</h3>
+<p>At this point, we have taken a look the basic details of the data including the assigned CRS. But what if we want to change the coordinate system?</p>
+<p>st_transform() allows for the data to be “transformed” (projected is also a good term) from one CRS to another. The basic syntax is as follows:</p>
+<p><strong>x &lt;- st_tranform(x, EPSG Code of new CRS)</strong></p>
+<p>Make sure you assign the function and code to the current shapefile you want to transform. Otherwise, it won’t apply to your data.</p>
+<hr />
+<p>For this assignment, we are going to transform our data to: NAD83 / Conus Albers (EPSG 5070).</p>
+<p>Lets change those CRS’ of the data. Check the code below:</p>
+<pre class="r"><code>counties &lt;- st_transform(counties, 5070)
+states &lt;- st_transform(states, 5070)
+roads &lt;- st_transform(roads, 5070)</code></pre>
+<hr />
+</div>
+<div id="st_geometry" class="section level3">
+<h3>st_geometry()</h3>
+<p>If the changing of our data worked, we should be able to plot our data.. Let’s plot states.</p>
+<pre class="r"><code>plot(states)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><strong>So what happened?</strong></p>
+<p>Well, if you only use the plot() function, that particular shapefile will plot not only the shapefile geometry but also the geometry for every column in the dataset (except for the geometry column - which contains the spatial data - the other columns are our tabular descriptive data).</p>
+<p>Above are 4 maps. How many columns were there? Check code below:</p>
+<pre class="r"><code>ncol(states)-1 # checking the number of columns, subtracting 1 as the geometry column doesn&#39;t plot</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p><strong>st_geometry()</strong> makes our life easier. The function goes inside the plot() function and the dataset we want to plot goes inside. Like this:</p>
+<p><strong>plot(st_geometry(states))</strong></p>
+<p>Let’s check it out:</p>
+<pre class="r"><code>plot(st_geometry(states))</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<hr />
+<div id="the-sign" class="section level4">
+<h4>The $ sign</h4>
+<p>You can also use the $ to direct your shapefile to plot only the geometry column. Like this:</p>
+<p><strong>plot(states$geometry)</strong></p>
+<p>Both ways work.. It’s up to you.</p>
+<hr />
+</div>
+<div id="add-t" class="section level4">
+<h4>Add = T</h4>
+<p>We can plot several shapefiles together in the same plot/map (IF they are in the same CRS, remember?). We simply add:</p>
+<p><strong>add = T</strong></p>
+<p>in our plot() function.</p>
+<p>Let’s plot States and Roads together. Check the code below:</p>
+<pre class="r"><code>plot(states$geometry)
+plot(st_geometry(roads$geometry), add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<hr />
+</div>
+</div>
+<div id="subsetting-spatial-data-frames" class="section level3">
+<h3>Subsetting Spatial Data Frames</h3>
+<p>The functions from the tidyverse can be directly applied to our spatial data for manipulation. If you remember from our objectives above, we are interested in mapping deer occurrences in the 4 corners states: AZ, UT, CO, NM. The “STATE” column in the states.shp contains the names of each state. We will use that as our subsetting column. Let’s call it states_4.</p>
+<p>Check the code for subsetting our spatial data:</p>
+<pre class="r"><code># Subset dataset to include only Four-corners states.
+corners4 &lt;- c(&quot;Arizona&quot;, &quot;Colorado&quot;, &quot;New Mexico&quot;, &quot;Utah&quot;) # state names
+
+states_4 &lt;- states %&gt;% # subsetting data from states
+  subset(STATE %in% corners4) # %in% searches lists; looking for names in States
+
+plot(states_4$geometry) # plot. Should be 4 corners states!</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="st_crop-vs.-st_intersection" class="section level3">
+<h3>st_crop() vs. st_intersection()</h3>
+<p>Subsetting our States shapefile to the 4 corners states was easy.. Mostly because the state name data was already supplied to us. What about roads and counties? Can we just subset them to the four corners states?</p>
+<p>Sadly, we can’t. Those data do not have a state column. However, there are some sf functions that allow us to clip the spatial dimensions of our data to match that of the 4 corners.</p>
+<div id="st_crop" class="section level4">
+<h4>st_crop()</h4>
+<p>st_crop() will crop an sf object to a specific rectangle.</p>
+<p>Let’s see what our roads data looks like when it is cropped to 4 corners. Check out the code below for the st_crop() syntax:</p>
+<pre class="r"><code>roads &lt;- st_crop(roads, states_4)</code></pre>
+<pre><code>## Warning: attribute variables are assumed to be spatially constant throughout all
+## geometries</code></pre>
+<pre class="r"><code>plot(states_4$geometry)
+plot(roads$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>So how does it look? Did it crop the way we thought it would?</p>
+<p>st_crop() actually doesn’t clip the data to the detailed geometry of the shapefile.. It clips the data to the bounding box extent of the data (imagine a box around our states that touches the N,S,E,W coordinates of the states).</p>
+<hr />
+</div>
+<div id="st_intersection" class="section level4">
+<h4>st_intersection()</h4>
+<p>st_intersection() is very similar to st_crop(), only it clips the data (the roads) to the detailed geometry of the shapefile of interest (the states).</p>
+<p>Let’s check it out below:</p>
+<pre class="r"><code>roads_4 &lt;- st_intersection(roads, states_4)</code></pre>
+<pre><code>## Warning: attribute variables are assumed to be spatially constant throughout all
+## geometries</code></pre>
+<pre class="r"><code>plot(states_4$geometry)
+plot(roads_4$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>This is much more useful (and nicer looking too!). We will be using st_intersection() for not only the roads but also the county data.</p>
+<pre class="r"><code>counties_4 &lt;- st_intersection(counties, states_4)</code></pre>
+<pre><code>## Warning: attribute variables are assumed to be spatially constant throughout all
+## geometries</code></pre>
+<pre class="r"><code>plot(states_4$geometry)
+plot(counties_4$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+</div>
+<div id="plotting-them-all-together" class="section level3">
+<h3>Plotting Them All Together!</h3>
+<p>Let’s make a quick plot using the shapefile geometries and add = T. Let’s give our data some color and a title.</p>
+<p>Check the code for the plot below:</p>
+<pre class="r"><code>plot(states_4$geometry, col = &quot;Black&quot;, main = &quot;Roads and Counties of the 4 Corners States&quot;)
+plot(counties_4$geometry, col = &quot;Tan&quot;, add = T)
+plot(roads_4$geometry, col = &quot;Red&quot;, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="st_as_sf" class="section level3">
+<h3>st_as_sf()</h3>
+<p>Lets get to our deer occurrences. We have a dataset of marked locations of either harvested or observed mule deer occurrence. However, the dataset is in .csv format…</p>
+<p>So how do we get it to become a shapefile? Let’s first load our .csv and take a look at the data:</p>
+<pre class="r"><code>### Load the deer csv using read.csv()| NOT in the sf package ###
+deer &lt;- read.csv(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/sf_datasets/mule_deer.csv&quot;)
+
+# Examine
+names(deer)</code></pre>
+<pre><code>##  [1] &quot;bisonID&quot;                        &quot;basisOfRecord&quot;                 
+##  [3] &quot;catalogNumber&quot;                  &quot;collectorNumber&quot;               
+##  [5] &quot;recordedBy&quot;                     &quot;providerID&quot;                    
+##  [7] &quot;institutionCode&quot;                &quot;resourceID&quot;                    
+##  [9] &quot;ownerInstitutionCollectionCode&quot; &quot;eventDate&quot;                     
+## [11] &quot;year&quot;                           &quot;verbatimEventDate&quot;             
+## [13] &quot;providedScientificName&quot;         &quot;scientificName&quot;                
+## [15] &quot;ITISscientificName&quot;             &quot;providedCommonName&quot;            
+## [17] &quot;ITIScommonName&quot;                 &quot;ITIStsn&quot;                       
+## [19] &quot;validAcceptedITIStsn&quot;           &quot;providedTSN&quot;                   
+## [21] &quot;decimalLatitude&quot;                &quot;decimalLongitude&quot;              
+## [23] &quot;geodeticDatum&quot;                  &quot;coordinatePrecision&quot;           
+## [25] &quot;coordinateUncertaintyInMeters&quot;  &quot;verbatimElevation&quot;             
+## [27] &quot;verbatimDepth&quot;                  &quot;centroid&quot;                      
+## [29] &quot;higherGeographyID&quot;              &quot;computedCountyFips&quot;            
+## [31] &quot;providedCounty&quot;                 &quot;calculatedCounty&quot;              
+## [33] &quot;providedState&quot;                  &quot;calculatedState&quot;               
+## [35] &quot;mrgid&quot;                          &quot;calculated_waterbody&quot;          
+## [37] &quot;establishmentMeans&quot;             &quot;countryCode&quot;                   
+## [39] &quot;institutionID&quot;                  &quot;collectionID&quot;                  
+## [41] &quot;relatedResourceID&quot;              &quot;associatedMedia&quot;               
+## [43] &quot;associatedReferences&quot;           &quot;generalComments&quot;               
+## [45] &quot;license&quot;</code></pre>
+<pre class="r"><code>head(deer, 2)</code></pre>
+<pre><code>##      bisonID basisOfRecord catalogNumber collectorNumber recordedBy
+## 1 2603288427   observation      42060189                   mheiner3
+## 2 1802756231   observation       9325949                         JB
+##                             providerID institutionCode
+## 1 28eb1a3f-1c15-4a95-931a-4af90ecb574d iNaturalist.org
+## 2 28eb1a3f-1c15-4a95-931a-4af90ecb574d iNaturalist.org
+##                             resourceID          ownerInstitutionCollectionCode
+## 1 50c9509d-22c7-4a22-a47d-8c48425ef4a7 iNaturalist Research-grade Observations
+## 2 50c9509d-22c7-4a22-a47d-8c48425ef4a7 iNaturalist Research-grade Observations
+##    eventDate year      verbatimEventDate                 providedScientificName
+## 1 2016-12-30 2016             2016-12-30 Odocoileus hemionus (Rafinesque, 1817)
+## 2 2007-02-17 2007 2007/02/17 4:57 PM HST Odocoileus hemionus (Rafinesque, 1817)
+##        scientificName  ITISscientificName providedCommonName ITIScommonName
+## 1 Odocoileus hemionus Odocoileus hemionus                         Mule Deer
+## 2 Odocoileus hemionus Odocoileus hemionus                         Mule Deer
+##   ITIStsn validAcceptedITIStsn providedTSN decimalLatitude decimalLongitude
+## 1  180698               180698       42220        40.76078         -111.891
+## 2  180698               180698       42220        37.24188         -112.961
+##   geodeticDatum coordinatePrecision coordinateUncertaintyInMeters
+## 1                                NA                         18968
+## 2                                NA                          5346
+##   verbatimElevation verbatimDepth centroid higherGeographyID computedCountyFips
+## 1                              NA                         NA              49035
+## 2                              NA                         NA              49053
+##   providedCounty  calculatedCounty providedState calculatedState mrgid
+## 1                 Salt Lake County          Utah            Utah    NA
+## 2                Washington County          Utah            Utah    NA
+##   calculated_waterbody establishmentMeans countryCode
+## 1                   NA                 HI          US
+## 2                   NA                 HI          US
+##                institutionID
+## 1 http://www.inaturalist.org
+## 2 http://www.inaturalist.org
+##                                                                                                                                                              collectionID
+## 1 https://www.inaturalist.org/observations?created_d2=2019-03-28T18%3A00%3A45-07%3A00&amp;license%5B%5D=CC0&amp;license%5B%5D=CC-BY&amp;license%5B%5D=CC-BY-NC&amp;quality_grade=research
+## 2 https://www.inaturalist.org/observations?created_d2=2019-03-28T18%3A00%3A45-07%3A00&amp;license%5B%5D=CC0&amp;license%5B%5D=CC-BY&amp;license%5B%5D=CC-BY-NC&amp;quality_grade=research
+##   relatedResourceID associatedMedia associatedReferences generalComments
+## 1                                NA                                     
+## 2                                NA                                     
+##        license
+## 1 CC_BY_NC_4_0
+## 2 CC_BY_NC_4_0</code></pre>
+<hr />
+<p>So that is a lot of information from one dataset.. We don’t need to know all of that or carry it around with us. We really only need to columns to make this tabular data into a spatial dataset: x and y.</p>
+<p>In this case, x and y are represented as Latitude and Longitude. Let’s subset our data by selecting the latitude and longitude columns (let’s also through in basisOfRecord, or, “how the deer occurrence was collected).</p>
+<pre class="r"><code># Subset to basisOfRecord, decimalLatitude, decimalLongitude
+deer &lt;- deer[c(22, 21, 2)]; names(deer)</code></pre>
+<pre><code>## [1] &quot;decimalLongitude&quot; &quot;decimalLatitude&quot;  &quot;basisOfRecord&quot;</code></pre>
+<pre class="r"><code># Rename
+names(deer) &lt;- c(&quot;X&quot;, &quot;Y&quot;, &quot;Record&quot;); names(deer)</code></pre>
+<pre><code>## [1] &quot;X&quot;      &quot;Y&quot;      &quot;Record&quot;</code></pre>
+<pre class="r"><code>head(deer,5)</code></pre>
+<pre><code>##           X        Y      Record
+## 1 -111.8910 40.76078 observation
+## 2 -112.9610 37.24188 observation
+## 3 -110.8036 37.39761 observation
+## 4 -109.5955 38.70784 observation
+## 5 -109.0730 37.38536 observation</code></pre>
+<hr />
+<p>Great. We’re ready to make our data spatial by adding a geometry column based off of our Latitude and Longitude columns. Since we’re using latitude and longitude, let’s bring the data in under a CRS that uses those units: WGS84, EPSG 4326.</p>
+<p>We’ll do that by using the st_as_sf() function. This function allows you to create a spatial geometry from tabular data that has two columns for coordinates (x&amp;y). It also requires the assignment of a CRS.</p>
+<p>The syntax looks like this:</p>
+<p><strong>variable &lt;- st_as_sf(data, coords = c(“X column name”, “Y Column name”), crs = EPSG Code)</strong></p>
+<pre class="r"><code># Make into an sf object with spatial geometry using st_as_sf
+deer &lt;- st_as_sf(deer, coords = c(&quot;X&quot;, &quot;Y&quot;), crs = 4326) # What happened here? Lets Check below.</code></pre>
+<p>Now plot it!</p>
+<pre class="r"><code># plot
+plot(deer$geometry) # How&#39;s it looking? What did we forget to change?</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>It’s looking good, but it’s in the wrong coordinate system. Let’s convert the CRS to 5070 to match the other data layers, then let’s plot them all together.</p>
+<pre class="r"><code># Transform
+deer_4 &lt;- st_transform(deer, 5070)
+
+# plot
+par(mfrow=c(1,1))
+plot(states_4$geometry, main = &quot;Deer, Roads, Counties, and the 4 Corner States&quot;)
+plot(counties_4$geometry, col = &quot;Tan&quot;, add = T)
+plot(roads_4$geometry, col = &quot;Red&quot;, add = T)
+plot(deer_4$geometry, col = &quot;Blue&quot;, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>A little busy looking, but we did it. We have brought in our shapefiles and occurrence data, manipulated it, and visualized it. It took about 5-6 functions to do so… But there are still so many more sf functions that are worth learning.</p>
+<p>Now we wont cover all of them here, but below are several that are worth visiting.</p>
+<hr />
+</div>
+<div id="st_buffer" class="section level3">
+<h3>st_buffer()</h3>
+<p>A buffer is exactly what it sounds like. st_buffer() creates a buffer around a point, line, or polygon at a designated distance. The syntax for st_buffer() is as follows:</p>
+<p><strong>buffer &lt;- st_buffer(data, dist = x)</strong></p>
+<p>*Dist = x; the unit of distance is directly related to the CRS unit of measurement (degrees, meters, etc.). CRS 5070 is in meters.</p>
+<p>Let’s do some examples and make 100,000 meter buffers around our points, lines, and polygons.</p>
+<p>Check out the code:</p>
+<pre class="r"><code>pts &lt;- st_buffer(deer_4, 100000)
+lines &lt;- st_buffer(roads_4, 100000)
+polygonz &lt;- st_buffer(states_4, 100000)
+
+par(mfrow=c(1,3))
+
+plot(pts$geometry, col = &quot;Blue&quot;)
+plot(deer_4$geometry, add = T, col = &quot;red&quot;)
+plot(lines$geometry, col = &quot;Blue&quot;, main = &quot;Buffers in Blue | Data in Red&quot;)
+plot(roads_4$geometry, add = T, col = &quot;red&quot;)
+plot(polygonz$geometry, col = &quot;Blue&quot;)
+plot(states_4$geometry, add = T, col = &quot;red&quot;)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="st_union" class="section level3">
+<h3>st_union()</h3>
+<p>st_union() merges all overlapping points, lines, or polygons from a dataset. For example, let’s look at our buffered points data from the previous function.</p>
+<pre class="r"><code>pts &lt;- st_buffer(deer_4, 100000)
+
+plot(pts$geometry, main = &quot;Buffered Deer Occurrence Points: 100,000 Meters&quot;)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<p>That’s a lot of buffered points and looks like a scene from the Ring. It’s pretty messy and not very useful at the moment. Let’s say we want the general outlining shape of the buffered points, but we want it as 1 polygon.</p>
+<p>That is where st_union() comes in. Let’s run st_union() on our buffered points and plot the occurrences inside the unionized buffers:</p>
+<pre class="r"><code>buffered_union &lt;- st_union(pts$geometry)
+
+plot(buffered_union)
+plot(deer_4$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="st_convex_hull" class="section level3">
+<h3>st_convex_hull()</h3>
+<p>Simply put, a convex hull polygon is a polygon that encapsulates points into a polygon by defining the polygon edges from the outer most points. It’s like the unionized buffer above, without the distance from the points created by the buffer.</p>
+<p>Convex hull polygons are popular in wildlife studies using occurrence data to create an polygon of the area of points.</p>
+<p>Lets run through an example:</p>
+<pre class="r"><code>CHP &lt;- st_convex_hull(st_union(deer_4)) # requires the use of st_union() on occurrences
+
+par(mfrow=c(1,2))
+plot(CHP, main = &quot;Convex Hull Polygon&quot;)
+plot(CHP, main = &quot;With Deer Occurrences&quot;)
+plot(deer_4$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<hr />
+<p>So how do st_union() and st_convex_hull() differ? These plots below explain it all:</p>
+<pre class="r"><code>par(mfrow=c(1,2))
+plot(buffered_union, main = &quot;Buffered Union&quot;)
+plot(deer_4$geometry, add = T)
+
+plot(CHP, main = &quot;Convex Hull Polygon&quot;)
+plot(deer_4$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="st_bbox-and-st_as_sfc" class="section level3">
+<h3>st_bbox() and st_as_sfc()</h3>
+<p>There is another option if you would like to create a bounding box around your data. Simply run the function st_bbox() for a perfect rectangle or square bounding box around your points, lines, or polygons.</p>
+<p>Check it out:</p>
+<pre class="r"><code># Bounding box to polygon
+bbox &lt;- st_bbox(deer_4)
+bbox # Coordinates of spatial extent of deer points</code></pre>
+<pre><code>##       xmin       ymin       xmax       ymax 
+## -1718842.7   999269.7  -526158.9  2205393.8</code></pre>
+<pre class="r"><code>class(bbox)</code></pre>
+<pre><code>## [1] &quot;bbox&quot;</code></pre>
+<pre class="r"><code>bbox &lt;- st_as_sfc(bbox) # make a spatial polygon
+plot(bbox) # plot it 
+plot(deer_4$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="st_area" class="section level3">
+<h3>st_area()</h3>
+<p>st_area() only works on vector data that has an area, so only polygons. However, when you run st_area() it will compute the area for each polygon in the order of the dataframe. Basically, the values come out a little messy looking. Let’s run it on our 4 corners states.</p>
+<pre class="r"><code>areaa &lt;- st_area(states_4); head(states_4$STATE) # see order of names</code></pre>
+<pre><code>## [1] &quot;New Mexico&quot; &quot;Utah&quot;       &quot;Colorado&quot;   &quot;Arizona&quot;</code></pre>
+<pre class="r"><code>areaa # area</code></pre>
+<pre><code>## Units: [m^2]
+## [1] 314917859635 219884501401 269602189121 295233523706</code></pre>
+<p>Let’s make that area output useful and put it into a new column on our states polygon:</p>
+<pre class="r"><code>states_4$area &lt;- st_area(states_4) 
+head(states_4, 5)</code></pre>
+<pre><code>## Simple feature collection with 4 features and 5 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -1746916 ymin: 991813.4 xmax: -504621.5 ymax: 2250688
+## Projected CRS: NAD83 / Conus Albers
+##    STFIPS      STATE STPOSTAL DotRegion                       geometry
+## 13     35 New Mexico       NM         6 MULTIPOLYGON (((-616759.3 1...
+## 24     49       Utah       UT         8 MULTIPOLYGON (((-1232642 22...
+## 27     08   Colorado       CO         8 MULTIPOLYGON (((-671178.4 2...
+## 56     04    Arizona       AZ         9 MULTIPOLYGON (((-1146481 16...
+##                  area
+## 13 314917859635 [m^2]
+## 24 219884501401 [m^2]
+## 27 269602189121 [m^2]
+## 56 295233523706 [m^2]</code></pre>
+<hr />
+</div>
+<div id="st_make_grid" class="section level3">
+<h3>st_make_grid()</h3>
+<p>Grids are useful for a number of analyses in spatial analysis (Zonal statistics, fishnet grids of probability modeling, etc.). st_make_grid() isn’t exactly the most clever name out there but there’s no second guessing what the function does. It makes grids (pretty much a raster dataset).</p>
+<p>Lets make a grid over our states polygon with cells that are 1000 square km. The cellsize will be created with the same units from the data CRS (using 5070, that’s meters).</p>
+<pre class="r"><code>gridz &lt;- st_make_grid(states_4, cellsize = 100000)
+plot(states_4$geometry, col = &quot;Blue&quot;, main = &quot;Grid&quot;)
+plot(gridz, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="st_coordinates" class="section level3">
+<h3>st_coordinates()</h3>
+<p>Sometimes when working with a shapefile, we only need the coordinates of that shapefile. For example, lets say we do not need the geometry column on our deer occurrences anymore, we just need the columns. We could subset the columns (an easy way), or we can run st_coordinates() (another easy way ).</p>
+<p>Let’s run it on our deer occurrences:</p>
+<pre class="r"><code>deer_coords &lt;- st_coordinates(deer_4) %&gt;% as.data.frame() # otherwise it is a matrix array
+head(deer_coords)</code></pre>
+<pre><code>##          X       Y
+## 1 -1324299 2083183
+## 2 -1482557 1710512
+## 3 -1292908 1696216
+## 4 -1167210 1825797
+## 5 -1142969 1672678
+## 6 -1357306 2187688</code></pre>
+<hr />
+</div>
+<div id="st_drop_geometry" class="section level3">
+<h3>st_drop_geometry()</h3>
+<p>A similar idea as the function above, st_drop_geometry() allows you to drop the geometry column from any spatial dataset. Lets see what the roads data looks like before and after dropping geometry:</p>
+<pre class="r"><code>head(roads_4, 5) # Before</code></pre>
+<pre><code>## Simple feature collection with 5 features and 8 fields
+## Geometry type: LINESTRING
+## Dimension:     XY
+## Bounding box:  xmin: -1001120 ymin: 1384435 xmax: -742620.6 ymax: 1583408
+## Projected CRS: NAD83 / Conus Albers
+##          LINEARID  FULLNAME RTTYP MTFCC STFIPS      STATE STPOSTAL DotRegion
+## 217 1106039038224 US Hwy 85     U S1100     35 New Mexico       NM         6
+## 219 1106039347635 US Hwy 85     U S1100     35 New Mexico       NM         6
+## 251 1106039037327 US Hwy 85     U S1100     35 New Mexico       NM         6
+## 337 1104492838446     I- 40     I S1100     35 New Mexico       NM         6
+## 431 1104257616668     I- 25     I S1100     35 New Mexico       NM         6
+##                           geometry
+## 217 LINESTRING (-770301 1498303...
+## 219 LINESTRING (-805218.9 14513...
+## 251 LINESTRING (-770258.4 14982...
+## 337 LINESTRING (-1001120 138443...
+## 431 LINESTRING (-919830.2 14326...</code></pre>
+<pre class="r"><code>head(st_drop_geometry(roads_4), 5) # After</code></pre>
+<pre><code>##          LINEARID  FULLNAME RTTYP MTFCC STFIPS      STATE STPOSTAL DotRegion
+## 217 1106039038224 US Hwy 85     U S1100     35 New Mexico       NM         6
+## 219 1106039347635 US Hwy 85     U S1100     35 New Mexico       NM         6
+## 251 1106039037327 US Hwy 85     U S1100     35 New Mexico       NM         6
+## 337 1104492838446     I- 40     I S1100     35 New Mexico       NM         6
+## 431 1104257616668     I- 25     I S1100     35 New Mexico       NM         6</code></pre>
+<hr />
+</div>
+<div id="st_intersects" class="section level3">
+<h3>st_intersects()</h3>
+<p>st_intersects() is a method for returning the count of spatial data within the area of another. A good example here would be, “How many points are there in each polygon?”.</p>
+<p>Let’s write the code for counting the number of each deer occurrence in each county. Then let’s add it to our counties dataset as a new column.</p>
+<p>Check out the code:</p>
+<pre class="r"><code># Points in Polygons with st_intersection
+count_data &lt;- counties_4 %&gt;%                         # Variable count_data subsetting from counties
+  mutate(counts = lengths(st_intersects(., deer_4)))   # create new column names &quot;counts&quot;. Lengths (the amount)
+names(count_data)                                    # intersected (within the polygon) from the deer dataset</code></pre>
+<pre><code>##  [1] &quot;STATEFP&quot;   &quot;COUNTYFP&quot;  &quot;COUNTYNS&quot;  &quot;GEOID&quot;     &quot;NAME&quot;      &quot;NAMELSAD&quot; 
+##  [7] &quot;LSAD&quot;      &quot;CLASSFP&quot;   &quot;MTFCC&quot;     &quot;CSAFP&quot;     &quot;CBSAFP&quot;    &quot;METDIVFP&quot; 
+## [13] &quot;FUNCSTAT&quot;  &quot;ALAND&quot;     &quot;AWATER&quot;    &quot;INTPTLAT&quot;  &quot;INTPTLON&quot;  &quot;STFIPS&quot;   
+## [19] &quot;STATE&quot;     &quot;STPOSTAL&quot;  &quot;DotRegion&quot; &quot;geometry&quot;  &quot;counts&quot;</code></pre>
+<pre class="r"><code># What does it look like
+head(count_data); names(count_data)</code></pre>
+<pre><code>## Simple feature collection with 6 features and 22 fields
+## Geometry type: GEOMETRY
+## Dimension:     XY
+## Bounding box:  xmin: -1204691 ymin: 1030545 xmax: -616769.9 ymax: 1618185
+## Projected CRS: NAD83 / Conus Albers
+##     STATEFP COUNTYFP COUNTYNS GEOID       NAME          NAMELSAD LSAD CLASSFP
+## 3        35      011 00933054 35011    De Baca    De Baca County   06      H1
+## 31       35      035 00929104 35035      Otero      Otero County   06      H1
+## 32       35      003 00929108 35003     Catron     Catron County   06      H1
+## 200      08      067 00198148 08067   La Plata   La Plata County   06      H1
+## 210      35      059 00929115 35059      Union      Union County   06      H1
+## 449      35      047 00929114 35047 San Miguel San Miguel County   06      H1
+##     MTFCC CSAFP CBSAFP METDIVFP FUNCSTAT       ALAND   AWATER    INTPTLAT
+## 3   G4020  &lt;NA&gt;   &lt;NA&gt;     &lt;NA&gt;        A  6016818946 29090018 +34.3592729
+## 31  G4020  &lt;NA&gt;  10460     &lt;NA&gt;        A 17126455954 36944199 +32.6155988
+## 32  G4020  &lt;NA&gt;   &lt;NA&gt;     &lt;NA&gt;        A 17933561654 14193499 +33.9016208
+## 200 G4020  &lt;NA&gt;  20420     &lt;NA&gt;        A  4376255277 25642579 +37.2873673
+## 210 G4020  &lt;NA&gt;   &lt;NA&gt;     &lt;NA&gt;        A  9906834380 15498790 +36.4880853
+## 449 G4020   106  29780     &lt;NA&gt;        A 12228666259 51380263 +35.4768585
+##         INTPTLON STFIPS      STATE STPOSTAL DotRegion
+## 3   -104.3686961     35 New Mexico       NM         6
+## 31  -105.7513079     35 New Mexico       NM         6
+## 32  -108.3919284     35 New Mexico       NM         6
+## 200 -107.8397178     35 New Mexico       NM         6
+## 210 -103.4757229     35 New Mexico       NM         6
+## 449 -104.8035189     35 New Mexico       NM         6
+##                           geometry counts
+## 3   POLYGON ((-760274.6 1325888...      1
+## 31  POLYGON ((-916054.9 1194727...    602
+## 32  POLYGON ((-1128293 1198329,...     18
+## 200 MULTIPOLYGON (((-1029975 16...      0
+## 210 POLYGON ((-624558.6 1515470...     20
+## 449 POLYGON ((-753725.7 1384155...     23</code></pre>
+<pre><code>##  [1] &quot;STATEFP&quot;   &quot;COUNTYFP&quot;  &quot;COUNTYNS&quot;  &quot;GEOID&quot;     &quot;NAME&quot;      &quot;NAMELSAD&quot; 
+##  [7] &quot;LSAD&quot;      &quot;CLASSFP&quot;   &quot;MTFCC&quot;     &quot;CSAFP&quot;     &quot;CBSAFP&quot;    &quot;METDIVFP&quot; 
+## [13] &quot;FUNCSTAT&quot;  &quot;ALAND&quot;     &quot;AWATER&quot;    &quot;INTPTLAT&quot;  &quot;INTPTLON&quot;  &quot;STFIPS&quot;   
+## [19] &quot;STATE&quot;     &quot;STPOSTAL&quot;  &quot;DotRegion&quot; &quot;geometry&quot;  &quot;counts&quot;</code></pre>
+</div>
+</div>
+<div id="geom_sf" class="section level2">
+<h2>geom_sf()</h2>
+<p>geom_sf() is a function that is tied to the ggplot2 package, not sf. Until this point, we have been using the plot() function. While useful, it doesn’t have the capabilities that ggplot2 does.</p>
+<p>This is just a sneak peak. We will cover cartography and spatial data visualization in week 7.</p>
+<p>Lets make a map of the counties polygons but have the colors correlate with the counts of deer occurrence per county:</p>
+<pre class="r"><code>ggplot() +
+  geom_sf(data = count_data, aes(fill = counts)) +
+  labs(title = &quot;ggplot2 can work with spatial data!&quot;)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+</div>
+<div id="bonus-parmfrowc" class="section level2">
+<h2>Bonus: par(mfrow=c(,))</h2>
+<p>If you do not know of this code yet, here is an option to have several graphs in one single plot.</p>
+<p><strong>par(mfrow=c(x,y))</strong></p>
+<p>x refers to how many rows.</p>
+<p>y refers to how many columns.</p>
+<p>Let’s say I want to have a single plot with 3 rows of graphs. In each row, I want 2 graphs. I would set up my code as such:</p>
+<p><strong>par(mfrow=c(3,2))</strong></p>
+<p>Then, after running that code, you would code your graphs. The graphs would occupy the plot from top 2 bottom, left 2 right.</p>
+<p>Here is an example:</p>
+<pre class="r"><code>par(mfrow=c(3,2))
+plot(states_4$geometry, col = &quot;red&quot;, main = &quot;Plot 1&quot;)
+plot(states_4$geometry, col = &quot;Blue&quot;, main = &quot;Plot 2&quot;)
+plot(states_4$geometry, col = &quot;Green&quot;, main = &quot;Plot 3&quot;)
+plot(states_4$geometry, col = &quot;Yellow&quot;, main = &quot;Plot 4&quot;)
+plot(states_4$geometry, col = &quot;Purple&quot;, main = &quot;Plot 5&quot;)
+plot(states_4$geometry, col = &quot;Tan&quot;, main = &quot;Plot 6&quot;)</code></pre>
+<p><img src="Introduction_to_Spatial_Vector_Data_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+</div>
+<div id="end" class="section level2">
+<h2>End</h2>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

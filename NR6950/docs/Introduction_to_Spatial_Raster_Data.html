@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Josh Carrell - Utah State University, MS Ecology" />
+
+
+<title>Introduction to Spatial Raster Data Using the terra Package</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">NR 6950: Geospatial Analysis for Natural Resources</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    R Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_R_Programming.html">Intro to R</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Wrangling.html">Intro to Data Wrangling</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Visualization.html">Intro to Data Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Geospatial Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_Geospatial_Data_Coordinate_Systems.html">Introduction to Coordinate Systems</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Vector_Data.html">Introduction to Spatial Vector Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Raster_Data.html">Introduction to Spatial Raster Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Remote_Sensing.html">Introduction to Remote Sensing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Advanced Geospatial Topics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Point_Pattern_Analysis.html">Point Pattern Analysis</a>
+    </li>
+    <li>
+      <a href="Burn_ratio.html">Remote Sensing: Difference Normalized Burn Ratio</a>
+    </li>
+    <li>
+      <a href="Species_Distribution_Modeling.html">Species Distribution Modeling</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Introduction to Spatial Raster Data Using the terra Package</h1>
+<h4 class="author">Josh Carrell - Utah State University, MS Ecology</h4>
+<h4 class="date">Last Update: May 13, 2022</h4>
+
+</div>
+
+
+<div id="spatial-raster-data" class="section level2">
+<h2>Spatial Raster Data</h2>
+<p>Welcome to Raster data. This is the fun stuff.</p>
+<p>If you remember from the week 4 lecture guide, spatial raster data consists of cells that are of equal width and length. These cells contain values which either numerical/continuous or discrete/categorical in nature.</p>
+<p><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/raster.png" /></p>
+<hr />
+<div id="tif.tiff-files" class="section level3">
+<h3>.tif/.tiff files</h3>
+<p>We will be working with .tif or .tiff files for a majority of the class (possibly all of it). tif stands for <strong>Tagged image format</strong> whereas tiff stands for <strong>Tagged image file format</strong>. The two versions are synonymous.</p>
+<p>Some other data types that function like .tif files are .img and .hdr files. For now, focus on the .tif.</p>
+</div>
+<div id="resolution" class="section level3">
+<h3>Resolution</h3>
+<p>Resolution (in working with the raster data of this guide) refers to pixel size. This is technically called “Spatial Resolution”. The data in this guide has a spatial resolution of 30m and 1km.</p>
+</div>
+</div>
+<div id="section" class="section level2">
+<h2><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/resolution.png" /></h2>
+</div>
+<div id="terra" class="section level2">
+<h2>terra</h2>
+<p>Straight from the R documentation on the terra package:</p>
+<p>“terra provides methods to manipulate geographic (spatial) data in”raster” and “vector” form. Raster data divide space into rectangular cells (pixels) and they are commonly used to represent spatially continuous phenomena, such as elevation or the weather. Satellite images also have this data structure. In contrast, “vector” spatial data (points, lines, polygons) are typically used to represent discrete spatial entities, such as a road, country, or bus stop.”</p>
+<p>Now, terra has the capability of being a one stop shop for using spatial data, both raster and vector. If you remember them from the week 4 lecture, we cover this briefly. Let’s look at SpatRasters and SpatVectors quickly once again.</p>
+<hr />
+<div id="spatvector" class="section level3">
+<h3>SpatVector</h3>
+<p>SpatVectors function the same way that vector data does. It is simply a different data type than your sf vectors and sometimes, it required for analysis using the terra package.</p>
+<hr />
+</div>
+<div id="spatraster" class="section level3">
+<h3>SpatRaster</h3>
+<p>“SpatRaster supports handling large raster files that cannot be loaded into memory; local, focal, zonal, and global raster operations; polygon, line and point to raster conversion; integration with modeling methods to make spatial predictions; and more” - R Documentation on terra package</p>
+<hr />
+</div>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>For this coding guide, we will be working with raster and vector data provided by the National Park Service, specifically Zion National Park. You can get spatial data of national parks, forests, and monuments from Data.gov. The boundaries of every National Park/Monument/Area under the specific agency jurisdiction is provided in the data folder called, “nps_boundary.shp”.</p>
+<p><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/zion.jpg" /></p>
+<pre class="r"><code>nps &lt;- sf::st_read(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/nps_boundary.shp&quot;)</code></pre>
+<pre><code>## Reading layer `nps_boundary&#39; from data source 
+##   `D:\R Textbook Template\NR6950 Notebook\NR 6950 Notebook\Data\nps_boundary.shp&#39; 
+##   using driver `ESRI Shapefile&#39;
+## Simple feature collection with 427 features and 15 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -170.7276 ymin: -14.28316 xmax: 145.7318 ymax: 68.65539
+## Geodetic CRS:  NAD83</code></pre>
+<pre class="r"><code>plot(nps$geometry, main = &quot;A lot of polygons!&quot;)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="objectives" class="section level2">
+<h2>Objectives</h2>
+<p>We’ll be walking through the basics of raster data analysis using the terra package. By the end of this guide, you will have a firm grasp on how to load, manipulate, analyze, and visualize raster data.</p>
+<hr />
+<div id="libraries" class="section level3">
+<h3>Libraries</h3>
+<p>Load the following libraries as you follow along:</p>
+<ol style="list-style-type: decimal">
+<li><p>terra</p></li>
+<li><p>sf</p></li>
+<li><p>tidyverse</p></li>
+</ol>
+<hr />
+</div>
+<div id="projections" class="section level3">
+<h3>Projections</h3>
+<p>If you remember from week 4, coordinate system data can be obtained from using EPSG codes. This week we will be using the proj4string data. Simply put, it is another way to project data. We’ll be projecting our data to NAD 83 Albers Equal Area by using it’s proj4string information. Check out the proj 4 string information in the code and copy it to your own R script.</p>
+<pre class="r"><code>prj.aeaN83 &lt;- &quot;+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs&quot;  </code></pre>
+<hr />
+</div>
+</div>
+<div id="terra-functions" class="section level2">
+<h2>terra functions</h2>
+<p>Just like the spatial vector coding guide, we will be walking through several functions that are important to learn in working with spatial vector data.</p>
+<div id="rast" class="section level3">
+<h3>rast()</h3>
+<p>The rast() function stands for raster. It is the method for loading raster data in R. Syntax is as follows:</p>
+<p><strong>variable &lt;- rast(“pathway/raster.tif”)</strong></p>
+<p>Let’s load in our 1 digital elevation models, using rast(). Load “zion_B”.</p>
+<p>NOTE: A Digital Elevation Model (DEM) is a raster data set that contains elevation information in each pixel. It is one of the most common raster data types you will encounter.</p>
+<pre class="r"><code>zionB &lt;- terra::rast(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/Rasters/zion_B.tif&quot;) # Load dem</code></pre>
+</div>
+<div id="summary" class="section level3">
+<h3>summary()</h3>
+<p>summary() provides a quick summary of the data by providing the basic descriptive statistics of the dataset. Since we are working with elevation in meters, we should see values in the 1000’s for Zion National Park.</p>
+<pre class="r"><code>terra::summary(zionB)</code></pre>
+<pre><code>## Warning: [summary] used a sample</code></pre>
+<pre><code>##      zion_B    
+##  Min.   :1171  
+##  1st Qu.:1835  
+##  Median :2109  
+##  Mean   :2153  
+##  3rd Qu.:2421  
+##  Max.   :3387</code></pre>
+</div>
+<div id="freq" class="section level3">
+<h3>freq()</h3>
+<p>freq() stands for frequency. This data can get overwhelming as it is equivalent the function, table(). It will return the count of cells that contain a given value. That’s alot of information. So lets just run a head() on it to get the idea.</p>
+<pre class="r"><code>head(terra::freq(zionB),5)</code></pre>
+<pre><code>##      layer value count
+## [1,]     1  1158     2
+## [2,]     1  1159     2
+## [3,]     1  1160     7
+## [4,]     1  1161    15
+## [5,]     1  1162    12</code></pre>
+</div>
+<div id="hist" class="section level3">
+<h3>hist()</h3>
+<p>A histogram would provide the same information as freq(), just in a visual and less overwhelming manner.</p>
+<pre class="r"><code>terra::hist(zionB)</code></pre>
+<pre><code>## Warning: [hist] a sample of8% of the cells was used</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="plot" class="section level3">
+<h3>plot()</h3>
+<p>By now, you’re very familiar with the plot() function. However, when working with SpatRasters, you need to be sure you are using the plot() function from the terra package. plot() from the base R package will not work on SpatRasters. One easy way to make sure you are using the right function is to call the package by using 2 :, like so:</p>
+<p><strong>terra::plot(raster)</strong></p>
+<p>I often call a package before using a specific function to be sure I am doing the right thing!</p>
+<pre class="r"><code>terra::plot(zionB)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="project" class="section level3">
+<h3>project()</h3>
+<p>project() is the equivalent of st_transform(), but for raster data. Check out the code:</p>
+<pre class="r"><code>zionB &lt;- terra::project(zionB, prj.aeaN83)
+terra::plot(zionB)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="mosaic" class="section level3">
+<h3>mosaic()</h3>
+<p>mosaic() is very similar to merging vector data, only with rasters. 2 or more overlapping/touching raster data can be combined into a single raster which is extremely useful.</p>
+<p>To get the idea, let’s look at our loaded raster data and the boundary of Zion National Park (we’ll need to subset that data from our larger dataset using the PARKNAME column and then transform it to match our Zion raster data).</p>
+<pre class="r"><code>zion_bounds &lt;- nps %&gt;% 
+  filter(PARKNAME == &quot;Zion&quot;) # subset to only Zion NP
+
+zion_bounds &lt;- st_transform(zion_bounds, prj.aeaN83) # change the crs
+
+plot(zionB) # plot
+plot(zion_bounds$geometry, add = T) # add boundary</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>So looking at the plot above, we are lucky enough that our raster data only covers about half of Zion… Luckily, we have the other half! Let’s load zion_A.</p>
+<pre class="r"><code>zionA &lt;- terra::rast(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/Rasters/zion_A.tif&quot;)
+
+zionA &lt;- terra::project(zionA, prj.aeaN83)
+
+
+terra::plot(zionA, main = &quot;They both cover Zion!&quot;)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>terra::plot(zionB, main = &quot;But we need them to be one...&quot;)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+<p>This is where mosaic() comes in. Check out the code and the output.</p>
+<pre class="r"><code>mosaic_r &lt;- mosaic(zionA, zionB)</code></pre>
+<pre><code>## Warning: [mosaic] rasters did not align and were resampled</code></pre>
+<pre class="r"><code>terra::plot(mosaic_r)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+<div id="crop-vs.-mask" class="section level3">
+<h3>crop() vs. mask()</h3>
+<p>Great. Our rasters are now 1 and they cover our park completely. We’re going to be running analyses on raster data in Zion so we don’t need all that excess data outside of the park boundary.</p>
+<p>Both crop() and mask() perform this action, only slightly different. Let’s take a look at what they do:</p>
+<p>NOTE: We are cropping/masking (essentially just trimming down the size of raster) a raster by a vector data. Currently, our Zion boundary was loaded through the package sf and is an sf object. <strong>For these funcitons to work, the sf objects must become SpatVectors</strong>. We can change the data by using the as() function. Check the code to see how it works.</p>
+<pre class="r"><code>zion_bounds_v &lt;- as(zion_bounds, &quot;SpatVector&quot;) # change to SpatVector
+
+Zion &lt;- terra::crop(mosaic_r, zion_bounds_v) # crop
+
+terra::plot(Zion, main = &quot;This is the crop() output!&quot;)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code>Zion_m &lt;- terra::mask(Zion, zion_bounds_v) # mask to a defined polygon boundary
+terra::plot(Zion_m, main = &quot;This is the mask() output!&quot;)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>From here on forward, we will be working with masked version.</p>
+<hr />
+</div>
+<div id="terrain" class="section level3">
+<h3>terrain()</h3>
+<p>terrain() allows you to compute terrain characteristics from a DEM. These characteristics are useful to have when examining a landscape. You will specify which characteristic you want to calculate in quotation marks.</p>
+<div id="slope" class="section level4">
+<h4>Slope</h4>
+<p>Slope measures the… well, slope. Slope is the the angle of a slopeing hill/cliff face and is provided in units between 0-90 degrees. 90 degrees being a straight up cliff while 0 degrees is flat ground.</p>
+<p>If you have been to Zion National Park (if you haven’t, you must go) you are familiar with the Sandstone cliffs. So in your mind, how would slope look? Probably alot of values between 80-90 degrees! There are a lot of cliffs in Zion.</p>
+<pre class="r"><code>slp &lt;- terra::terrain(Zion_m, &quot;slope&quot;)
+terra::plot(slp)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="aspect" class="section level4">
+<h4>Aspect</h4>
+<p>Aspect refers to the direction the slope face is facing. The output is measured in 360 degrees with North being values 0/360, east being 90, south being 180, and west being 270.</p>
+<pre class="r"><code>asp &lt;- terra::terrain(Zion_m, &quot;aspect&quot;)
+terra::plot(asp)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+<div id="tpi" class="section level4">
+<h4>TPI</h4>
+<p>Topographic position index (TPI) is an algorithm increasingly used to measure topographic slope positions and to automate landform classifications. If you look close (and you will need to look close…), you can see the general landscape of Zion being broken up into sub-landscape types.</p>
+<pre class="r"><code>tpi &lt;- terra::terrain(Zion_m, &quot;TPI&quot;)
+terra::plot(tpi)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+<div id="tri" class="section level4">
+<h4>TRI</h4>
+<p>The topographic ruggedness index (TRI) was developed by Riley et al. (1999) to express the amount of elevation difference between adjacent cells of a DEM. It calculates the difference in elevation values from a center cell and the eight cells immediately surrounding it. Basically, higher values indicate a greater change in elevation between cells.</p>
+<pre class="r"><code>tri &lt;- terra::terrain(Zion_m, &quot;TRI&quot;)
+terra::plot(tri)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+</div>
+<div id="roughness" class="section level4">
+<h4>roughness</h4>
+<p>Roughness is the degree of irregularity of the surface. It’s calculated by the largest inter-cell difference of a central pixel and its sourrounding cell. Do you see any differences between roughness and TRI? Hardly.</p>
+<p>Rougher terrains are an important indicator of habitat resources of certain wildlife species. For example, Mtn Lions like rough terrain.</p>
+<pre class="r"><code>rough &lt;- terra::terrain(Zion_m, &quot;roughness&quot;)
+terra::plot(rough)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+</div>
+</div>
+<div id="c" class="section level3">
+<h3>c()</h3>
+<p>Great. We’ve started with a DEM and calculate 5 extra terrain characteristics. Pretty cool, huh?</p>
+<p>Now we could plot them all separately and save them all as individual rasters. However, raster data has the unique option of being “stacked”. If 2 or more raster data have the same extent, crs, and resolution, they can be stacked on top of each other and act as a single .tif file of multiple layers.</p>
+<p>It’s pretty simple to do. Just using the c() function and assign a variable all of the raster data you want.</p>
+<pre class="r"><code>rasterz &lt;- c(Zion_m, slp, asp, tpi, tri, rough)
+
+rasterz</code></pre>
+<pre><code>## class       : SpatRaster 
+## dimensions  : 1601, 985, 6  (nrow, ncol, nlyr)
+## resolution  : 27.9354, 27.9354  (x, y)
+## extent      : -1501419, -1473902, 1698450, 1743175  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+## sources     : memory  
+##               memory  
+##               memory  
+##               ... and 3 more source(s)
+## names       :        zion_A,         slope,        aspect,           TPI,           TRI,     roughness 
+## min values  :  1.118037e+03,  1.451942e-02,  5.216110e-13, -1.073425e+02,  5.718994e-02,  0.000000e+00 
+## max values  :    2662.07104,      82.77046,     359.99973,     116.36192,     179.66139,     497.51733</code></pre>
+<pre class="r"><code>dim(rasterz)</code></pre>
+<pre><code>## [1] 1601  985    6</code></pre>
+<pre class="r"><code>terra::plot(rasterz)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+</div>
+<div id="contour" class="section level3">
+<h3>contour()</h3>
+<p>If you have ever taken a physical geology/geography course, or ever looked a map, chances are you have come across contour lines. Contours are lines that continually cross a single unit of elevation.</p>
+<p>If contour lines are close together on a map, count on steep terrain. If they are widespread, the terrain should be gently slopes.</p>
+<p>contour() allows you to create contour lines on a DEM. Check out the code to create contours!</p>
+<pre class="r"><code>terra::plot(Zion_m)
+terra::contour(Zion_m, add = T)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>Don’t like the distance between lines? You can change this by including the specified number of contours you would like. use “nlevels =”. Let’s make 5 contours.</p>
+<pre class="r"><code>terra::plot(Zion_m, main = &quot;5 Contours&quot;)
+terra::contour(Zion_m, add = T, nlevels = 5)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+</div>
+<div id="classify" class="section level3">
+<h3>classify()</h3>
+<p>classify() allows you to reclassify the values of a given raster. For example, our DEM has values from ~1100 to ~2650. Any value between those 2, could occupy and given cell within that raster.</p>
+<p>Reclassifying a raster would allow us to say, “Any value between 1000-1500m in elevation will now have the same pixel value”. We are really just breaking down all the potential values into categories.</p>
+<p>Take a look at the code and the output below:</p>
+<pre class="r"><code>Zion_m</code></pre>
+<pre><code>## class       : SpatRaster 
+## dimensions  : 1601, 985, 1  (nrow, ncol, nlyr)
+## resolution  : 27.9354, 27.9354  (x, y)
+## extent      : -1501419, -1473902, 1698450, 1743175  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+## source      : memory 
+## name        :   zion_A 
+## min value   : 1118.037 
+## max value   : 2662.071</code></pre>
+<pre class="r"><code>classifyz &lt;- terra::classify(Zion_m, 
+                             c(1000, 
+                               1500,
+                               2000,
+                               2500,
+                               3000))
+terra::plot(classifyz)
+plot(zion_bounds$geometry, add = T)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+</div>
+<div id="extract" class="section level3">
+<h3>extract()</h3>
+<p>extract() does exactly what it sounds like. It extracts. A very common practice in spatial modeling (species distribution modeling in particular!) requires a dataset of points that contain the value of the many raster data it overlaps with.</p>
+<p>For example, load into your script the “overlook.shp”. These are designated scenic overlooks in Zion.</p>
+<pre class="r"><code>overlook &lt;- sf::st_read(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/Rasters/overlook.shp&quot;) # Load</code></pre>
+<pre><code>## Reading layer `Overlook&#39; from data source 
+##   `D:\R Textbook Template\NR6950 Notebook\NR 6950 Notebook\Data\Rasters\Overlook.shp&#39; 
+##   using driver `ESRI Shapefile&#39;
+## Simple feature collection with 15 features and 30 fields
+## Geometry type: POINT
+## Dimension:     XY
+## Bounding box:  xmin: 305178.6 ymin: 4115900 xmax: 333338.2 ymax: 4148434
+## Projected CRS: NAD83 / UTM zone 12N</code></pre>
+<pre class="r"><code>overlook &lt;- st_transform(overlook, prj.aeaN83) # Transform to match
+
+
+
+terra::plot(Zion_m, main = &quot;Scenic Overlook Points on Zion DEM&quot;) # plot dem
+plot(zion_bounds$geometry, add = T) # Zion boundary
+plot(overlook$geometry, add = T, pch = 18) # add points, pch = symbol shape.</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p>Now our overlook points do not have information regarding our DEM values. BUT, in space, they are synonymous with an associated elevation.</p>
+<p>extract() can take point data, and extract those associated values of a raster (or polygon!). Lets give it a test run and see the output for extracting values from our DEM to our points.</p>
+<pre class="r"><code>overlook_v &lt;- as(overlook, &quot;SpatVector&quot;) # must be spatvector when working with spatraster
+overlook_ex &lt;- terra::extract(Zion, overlook_v) #raster first, point data second
+pander::pander(head(overlook_ex)) # pander table</code></pre>
+<table style="width:19%;">
+<colgroup>
+<col width="6%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">ID</th>
+<th align="center">zion_A</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">1864</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">1677</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">1900</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">1652</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">2382</td>
+</tr>
+<tr class="even">
+<td align="center">6</td>
+<td align="center">2278</td>
+</tr>
+</tbody>
+</table>
+<p>The output table above is ID: the id of the point data, and zion_A: The elevation value in the cell of the overlapping point. So now, we have elevations of each scenic overlook!</p>
+<hr />
+<p>This can also work with raster stacks! Let’s extract the values of our stacked rasters.</p>
+<pre class="r"><code>overlook_v &lt;- as(overlook, &quot;SpatVector&quot;) # must be spatvector when working with spatraster
+overlook_ex &lt;- terra::extract(rasterz, overlook_v) #raster first, point data second
+pander::pander(head(overlook_ex)) # pander table</code></pre>
+<table style="width:85%;">
+<colgroup>
+<col width="6%" />
+<col width="12%" />
+<col width="11%" />
+<col width="12%" />
+<col width="13%" />
+<col width="11%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">ID</th>
+<th align="center">zion_A</th>
+<th align="center">slope</th>
+<th align="center">aspect</th>
+<th align="center">TPI</th>
+<th align="center">TRI</th>
+<th align="center">roughness</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">1864</td>
+<td align="center">26.5</td>
+<td align="center">357.7</td>
+<td align="center">-0.2674</td>
+<td align="center">10.32</td>
+<td align="center">29.32</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">1677</td>
+<td align="center">7.011</td>
+<td align="center">3.884</td>
+<td align="center">0.3437</td>
+<td align="center">2.979</td>
+<td align="center">8.588</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">1900</td>
+<td align="center">3.426</td>
+<td align="center">124.4</td>
+<td align="center">1.52</td>
+<td align="center">1.916</td>
+<td align="center">6.234</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">1652</td>
+<td align="center">19.75</td>
+<td align="center">3.412</td>
+<td align="center">-2.028</td>
+<td align="center">7.712</td>
+<td align="center">21.8</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">2382</td>
+<td align="center">30</td>
+<td align="center">77.48</td>
+<td align="center">4.235</td>
+<td align="center">13.44</td>
+<td align="center">44.77</td>
+</tr>
+<tr class="even">
+<td align="center">6</td>
+<td align="center">2278</td>
+<td align="center">4.216</td>
+<td align="center">152.7</td>
+<td align="center">0.9659</td>
+<td align="center">1.679</td>
+<td align="center">6.302</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+<div id="rasterize" class="section level3">
+<h3>rasterize()</h3>
+<p>You might be saying, “This is all great! But what if you have polygons of some data that you can’t find as a raster?”. Well if that’s you, then look no further!</p>
+<p>rasterize() allows you to rasterize polygons. It requires you to have: 1) a polygon to rasterize; 2) a raster dataset.</p>
+<p>The polygon will then be rasterized and will match the same CRS and resolution as the provided raster.</p>
+<p>In the data folder, I have provided a shapefile called “soil.shp”. Load it in your script and let’s look at it.</p>
+<pre class="r"><code>soils &lt;- sf::st_read(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/Rasters/soil.shp&quot;)</code></pre>
+<pre><code>## Reading layer `soil&#39; from data source 
+##   `D:\R Textbook Template\NR6950 Notebook\NR 6950 Notebook\Data\Rasters\soil.shp&#39; 
+##   using driver `ESRI Shapefile&#39;
+## Simple feature collection with 13 features and 59 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -1501414 ymin: 1698460 xmax: -1473913 ymax: 1743165
+## CRS:           unknown</code></pre>
+<pre class="r"><code>plot(soils$geometry)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<pre class="r"><code>head(soils, 2)</code></pre>
+<pre><code>## Simple feature collection with 2 features and 59 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -1501414 ymin: 1709128 xmax: -1474838 ymax: 1743165
+## CRS:           unknown
+##    mukey  taxorder taxsuborde   taxgrtgrou           taxsubgrp subord grtgrp
+## 1 658437  Entisols   Fluvents Ustifluvents Aridic Ustifluvents    Flu    Ust
+## 2 674742 Mollisols    Ustolls  Haplustolls  Lithic Haplustolls    Ust    Hap
+##   c_order c_sbord c_ggrp phmin phave phmax frag3to10 sieveno4 sieveno10
+## 1     104     110    137   660   792   900         1       92        89
+## 2     107     125    120   560   744   840         9       85        82
+##   sieveno40 sieveno200 sand silt clay omr dryweight ksat awc wsat minalogy
+## 1        77         51   46   34   20  93       175  282  18   39    mixed
+## 2        72         54   43   31   26 375       169  917   6    0    mixed
+##     reaction ph_ave frag_3to10 sieve_4 sieve_10 sieve_40 sieve_200 sand_txt
+## 1 calcareous    792          1      92       89       77        51       46
+## 2       &lt;NA&gt;    744          9      85       82       72        54       43
+##   silt_txt clay_txt orgmat dwieght ksat_txt awc_txt wsat_txt minerals
+## 1       34       20     93     175      282      18       39    mixed
+## 2       31       26    375     169      917       6       na    mixed
+##   calcereous UNIT_CODE
+## 1 calcareous      ZION
+## 2       &lt;NA&gt;      ZION
+##                                                                             GIS_Notes
+## 1 Lands - http://landsnet.nps.gov/tractsnet/documents/ZION/Metadata/zion_metadata.xml
+## 2 Lands - http://landsnet.nps.gov/tractsnet/documents/ZION/Metadata/zion_metadata.xml
+##            UNIT_NAME  DATE_EDIT STATE REGION GNIS_ID     UNIT_TYPE CREATED_BY
+## 1 Zion National Park 2017-06-22    UT     IM 1455157 National Park      Lands
+## 2 Zion National Park 2017-06-22    UT     IM 1455157 National Park      Lands
+##                                                   METADATA PARKNAME Shape_Leng
+## 1 https://irma.nps.gov/DataStore/Reference/Profile/2181118     Zion   1.638446
+## 2 https://irma.nps.gov/DataStore/Reference/Profile/2181118     Zion   1.638446
+##   Shape_Area Unified_Re Old_Region                       geometry
+## 1 0.06115851          7         IM MULTIPOLYGON (((-1497787 17...
+## 2 0.06115851          7         IM MULTIPOLYGON (((-1475591 17...</code></pre>
+<p>So this data is already trimmed to the Zion NP boundary and contains a lot of fields! As you recall, a shapefile can contain 1 geometry but multiple characteristics.</p>
+<p>Let’s rasterize this thing. The syntax is as follows:</p>
+<p><strong>variable &lt;- rasterize(polygon, raster, field = “Which column do you want to rasterize?”)</strong></p>
+<p>Let’s rasterize phmin (minimum ph level in the soil):</p>
+<pre class="r"><code>soils_v &lt;- as(soils, &quot;SpatVector&quot;) # Must be spatvector
+
+phave &lt;- terra::rasterize(soils_v, Zion_m, field = &quot;phmin&quot;)
+
+plot(phave)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+</div>
+<div id="raster-math" class="section level3">
+<h3>Raster Math</h3>
+<p>Rasters of equal extent, resolution, and crs can use mathematical functions to generate new rasters of the same spatial characteristics.</p>
+<p>I’ve provided some rasters of current annual mean temperature and the projected future annual mean temperature for 2100.</p>
+<p>Since they are the same CRS, resolution, and extent, I can use mathematical operators to work with my data. Let’s first look at the rasters.</p>
+<pre class="r"><code>clim &lt;- terra::rast(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/Rasters/amt.tif&quot;)
+terra::plot(clim)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p>While they look exactly the same, look at the scale bars on the right of each plot. 2100 is showing much higher annual mean temperature.</p>
+<p>We can find out the difference between the 2 rasters by simply subtracting the future projection by the current. Values will be negative… so the more negative the number, the greater the change.</p>
+<pre class="r"><code>x &lt;- (clim$`CHELSA_bio1_1981-2010_V.2.1`-clim$`CHELSA_bio1_2071-2100_gfdl-esm4_ssp585_V.2.1`)
+terra::plot(x)</code></pre>
+<p><img src="Introduction_to_Spatial_Raster_Data_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+</div>
+<div id="writeraster" class="section level3">
+<h3>writeRaster()</h3>
+<p>After you have created a raster stack or new raster, you can save it to a specified folder using writeRaster.</p>
+<p><strong>writeRaster(raster, filename = “pathway/name you would like your raster to be.tif”)</strong></p>
+</div>
+</div>
+<div id="raster-data-sources" class="section level2">
+<h2>Raster Data Sources</h2>
+<ul>
+<li><p>The National Map Downloader: <a href="https://apps.nationalmap.gov/downloader/#/" class="uri">https://apps.nationalmap.gov/downloader/#/</a></p></li>
+<li><p>Natural Earth Data: <a href="http://www.naturalearthdata.com/downloads/" class="uri">http://www.naturalearthdata.com/downloads/</a></p></li>
+<li><p>Free GIS Dara Library: <a href="https://freegisdata.rtwilson.com/" class="uri">https://freegisdata.rtwilson.com/</a></p></li>
+</ul>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,270 @@
+---
+title: "Point Pattern Analysis: Coding Guide"
+author: "Josh Carrell - Utah State University, MS Ecology"
+date: "Last Update: `r format(Sys.time(), '%B %d, %Y')`"
+output:
+ html_document:
+    toc: true
+    toc_float:
+      toc_collapsed: true
+    toc_depth: 4
+    number_sections: False
+    theme: spacelab
+    code_folding: 'hide'
+    
+---
+
+## Point-Pattern Analysis (PPA) - Definition 
+
+Point-Pattern Analysis is the is the examination of the spatial arrangements of points in (usually 2-dimensional) space. While, PPA allows us to examine patterns, it is what the points represent that allows us to better understand the world around us. 
+
+PPA is a big topic in spatial statistics. So for time's sake (We have much to cover yet!), we won't be covering anything too crazy. We will be learning how to set up a point pattern analysis study with our data, visualize point density, and use a simple function to estimate relationships and randomness. 
+
+## Kernal Density
+
+Kernel density is a non-parametric way to estimate the probability density function of a random variable.
+
+## SpatStat
+
+Spatstat is a family of packages for the statistical analysis of spatial point patterns.
+Load the Spatstat package. 
+
+```{r, echo=FALSE, message=FALSE}
+# point pattern analysis with spatstat
+
+library(terra)
+library(spatstat)
+prj.aeaN83 <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"  
+
+```
+
+## Data
+
+For this analysis, we are going to be analyzing point patterns for various causes of fires in Tonto National Forest located in central Arizona. 
+
+In your week 9 data folder, you should find two shapefiles:
+
+- fire_tonto.shp (Fire occurrence starting points)
+
+- Tonto_NF.shp (Tonto National Forest Boundary)
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/tonto.jpg)
+
+```{r}
+fire <- terra::vect("D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/Point_pattern/fire_tonto.shp")
+tonto <- terra::vect("D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/Point_pattern/Tonto_NF.shp")
+
+fire <- terra::project(fire, prj.aeaN83)
+tonto <- terra::project(tonto, prj.aeaN83)
+
+```
+
+
+```{r}
+head(fire,5)
+```
+
+
+### Initial Plotting
+
+The fire points shapefile contains a column called "STATISTICA", which contains the different classes of fire starts.
+
+Let's go ahead and give our data some initial plotting. 
+
+```{r}
+
+terra::plot(fire, "STATISTICA", plg=list(x="bottomleft", title = "Ignition Cause"), 
+            pax=list(las=1), main = "Fire Starts")
+terra::plot(tonto, add = T)
+
+
+```
+
+## Point Pattern Analysis - Code
+
+### Observation Window - as.owin()
+
+as.owin() is the function for creating an "observation window" for point pattern analysis. Basically it creates the bounding box for which inside our analysis will take place. 
+
+```{r}
+terra::plot(tonto)
+```
+
+
+In our case, we want to look at point pattern analysis within Tonto National Forest. We will turn that polygon into our "owin".
+
+---
+
+```{r}
+library(spatstat)
+tontoOwin <- as.owin(sf::st_as_sf(tonto))
+class(tontoOwin)
+```
+
+NOTE: We brought in our shapefiles as spatvectors through the terra library. We must have our shapefile be an sf object to become an "owin". Use st_as_sf() to change our spatvector to sf.
+
+---
+
+
+### ppp()
+
+The function ppp() works on changing the coordinates of a dataset of points (our fire starts) into the class "ppp". "ppp" represents a point pattern dataset in the two-dimensional plane.
+
+---
+
+To create a "ppp" you must create a dataset that has only coordinates. We can do this by using crds() from the terra package.
+
+```{r}
+pts <- terra::crds(fire)
+head(pts)
+```
+
+---
+
+Now that we have our coordinates, we can develop our ppp by using the function and following syntax:
+
+---
+
+**variable <- ppp(point_dataset[,1], point_dataset[,2], window = tontoOwin)**
+
+---
+
+[,1] & [,2] refer to each column within our dataset (longitude and latitude) and the window refers to the observation window we created of the Tonto National Forest polygon.
+
+```{r}
+p <- ppp(pts[,1], pts[,2], window=tontoOwin) # define x and y point and window
+
+p # what does this look like?
+
+plot(p) # plots the ppp (points) and the window (boundary) together.
+
+```
+
+---
+
+### density()
+
+density(), from the *stats* package (don't worry, it's already loaded for you in R by default), computed the kernel density estimates from a point pattern dataset (our "ppp"). 
+Simply put in our "ppp" which is assigned to p.
+
+```{r}
+ds <- density(p)
+
+```
+
+---
+
+If we check the class of "ds" we will see it is "im". 
+
+```{r}
+class(ds)
+```
+
+"im" represents a two-dimensional pixel image.
+
+--
+
+## Plotting Point Density
+
+And as simple as that, we can plot the kernel density estimates for our point pattern of fire starts!
+
+```{r}
+plot(ds, main='fire start density')
+```
+
+---
+
+### Plotting Multiple
+
+Below is some code for a for-loop that sets up a quick plot of 4 specific fire start causes. We will generate point density and test whether two of these have spatial relationships.
+
+For this example, We will examine fires caused by:
+
+- Equipment Use
+
+- Smoking
+
+- Campfires
+
+- Arson
+
+
+```{r}
+par(mfrow=c(2,2))
+for (type in c("2 -  Equipment Use", "3 -  Smoking", "4 -  Campfire", "7 -  Arson")) {
+  plot(tonto, col='grey')
+  fire_t <- fire[fire$STATISTICA == type, ]
+  points(fire_t, col = "red")
+  title(type)
+}
+
+```
+
+## Multiple Point Patterns
+
+We can do the same process as above for all of the objects in the dataset at once by using **marks =** withon our ppp() function. 
+
+The categories for fire starts are within the fire point dataset under the column *STATISTICA*. Since these categories are text and not factors, the ppp() function wont understand that they are really different categories of fire starts. 
+
+We can produce a ppp class that has each category readily available to plot as a density.
+
+In our code below, lets make the fire categories a factor and then assign them to our marks =. 
+
+```{r}
+
+# add in marks by using as.factor() around the column of interest.
+mpp <- ppp(pts[,1], pts[,2], window = tontoOwin, marks=as.factor(fire$STATISTICA))
+
+
+```
+
+### Plot Multiple Point Patterns 
+
+Now lets plot the 4 point patterns of interest.
+
+```{r}
+spp <- split(mpp) # divides data into groups based upon marks = above
+
+plot(density(spp[c(2:4, 7)]), main='') # Plot Densities
+
+```
+
+## K Cross Function
+
+Now that we have generated point patterns for our fire starts, we can do a quick test to see if they is any clustering of two sets of patterns or to infer there is any relationship to their occurrences. 
+
+Using the envelope() function, we will examine clustering between smoking are arson point patterns. The syntax is as follows:
+
+**variable <- envelope(ppp variable, Kcross, nsim = # of choice, i = "variable 1", j = "variable 2")
+
+---
+
+NOTE:
+
+- nsim = Number of simulated point patterns to be generated when computing the envelopes
+
+---
+
+Let's plot: 
+
+```{r}
+ekc <- envelope(mpp, Kcross, nsim = 5, i = "3 -  Smoking", j = "7 -  Arson")
+plot(ekc, main = "Smoking and Arson")
+
+```
+
+### Interpretation
+
+The dashed red line in our KCross plot represents the reference line for complete spatial randomness between the two point patterns.
+
+---
+
+The grey line around the red line is the randomization envelope.
+
+---
+
+The black line represent the Kcross function for these two point patterns.
+
+---
+
+So our black line is quite a bit higher than the red dashed line. This gives us evidence that there is clustering of the two point patterns in this example. 

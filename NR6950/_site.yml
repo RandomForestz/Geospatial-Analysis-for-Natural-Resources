@@ -1,0 +1,40 @@
+name: "NR 6950 Notebook"
+navbar:
+  title: "NR 6950: Geospatial Analysis for Natural Resources"
+  left:
+    - text: "R Basics"
+      menu:
+        - text: "Intro to R"
+          href: Introduction_to_R_Programming.html
+        - text: "Intro to Data Wrangling"
+          href: Introduction_to_Data_Wrangling.html
+        - text: "Intro to Data Visualization"
+          href: Introduction_to_Data_Visualization.html
+    - text: "Geospatial Basics"
+      menu:
+        - text: "Introduction to Coordinate Systems"
+          href: Introduction_to_Geospatial_Data_Coordinate_Systems.html
+        - text: "Introduction to Spatial Vector Data"
+          href: Introduction_to_Spatial_Vector_Data.html
+        - text: "Introduction to Spatial Raster Data"
+          href: Introduction_to_Spatial_Raster_Data.html          
+        - text: "Introduction to Remote Sensing"
+          href: Introduction_to_Remote_Sensing.html  
+    - text: "Advanced Geospatial Topics"
+      menu:
+        - text: "Point Pattern Analysis"
+          href: Point_Pattern_Analysis.html
+        - text: "Remote Sensing: Difference Normalized Burn Ratio"
+          href: Burn_ratio.html
+        - text: "Species Distribution Modeling"
+          href: Species_Distribution_Modeling.html          
+
+
+          
+output_dir: 'docs'
+
+output: 
+  html_document:
+    theme: spacelab
+
+  

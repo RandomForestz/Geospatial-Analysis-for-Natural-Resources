@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Josh Carrell - Utah State University, MS Ecology" />
+
+
+<title>Normalized Burn Ratio</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">NR 6950: Geospatial Analysis for Natural Resources</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    R Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_R_Programming.html">Intro to R</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Wrangling.html">Intro to Data Wrangling</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Visualization.html">Intro to Data Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Geospatial Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_Geospatial_Data_Coordinate_Systems.html">Introduction to Coordinate Systems</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Vector_Data.html">Introduction to Spatial Vector Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Raster_Data.html">Introduction to Spatial Raster Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Remote_Sensing.html">Introduction to Remote Sensing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Advanced Geospatial Topics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Point_Pattern_Analysis.html">Point Pattern Analysis</a>
+    </li>
+    <li>
+      <a href="Burn_ratio.html">Remote Sensing: Difference Normalized Burn Ratio</a>
+    </li>
+    <li>
+      <a href="Species_Distribution_Modeling.html">Species Distribution Modeling</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Normalized Burn Ratio</h1>
+<h4 class="author">Josh Carrell - Utah State University, MS Ecology</h4>
+<h4 class="date">Last Update: May 13, 2022</h4>
+
+</div>
+
+
+<div id="fire-and-remote-sensing" class="section level2">
+<h2>Fire and Remote Sensing</h2>
+<p>Fire, particularly wildland fire, has long been studied using remote sensing. It is quite useful in determining fire spatial extent, monitoring regrowth post-fire, and characterizing fire severity. Using various sensors, remote sensing based studies of fire can range from a single fire to the long term monitoring of global fire occurrence.</p>
+<div class="figure">
+<img src="D:/NR_6950/images/fire.jpg" alt="" />
+<p class="caption">The Camp wildfire of 2018 from the view of Landsat 8 sensors. The Camp fire was the deadliest fire in recent history, taking the lives 85 individuals.</p>
+</div>
+<p>Given warming climates, drier conditions, and more people living near wildland-urban interfaces, large-scale fire may become more common and more deadlier. Fire, however, is an important ecological process and more frequent low-severity fires are healthy for many forests. Given the issues that face humans and fires, and fires and forests, a strong knowledge of remote sensing is important for anyone wanting to study fire.</p>
+<hr />
+</div>
+<div id="normalized-burn-ratio-nbr" class="section level2">
+<h2>Normalized Burn Ratio (NBR)</h2>
+<p>There are a lot of studies on fire and remote sensing, we are just going to cover 1 common algorithm for characterizing fire severity (How intense a fire burns through vegetation). The algorithm we will cover is called the Normalized Burn Ratio (NBR). NBR is used to identify burned areas and provide a measure of burn severity. To perform this, you need to have imagery that contains band in the Near-Infrared (NIR), a band within 760 - 900 nm, and Shortwave Infrared (SWIR), a band within 2080 - 2350 nm on the electromagnetic spectrum. The equation is as follows:</p>
+<p><strong>NBR = ((NIR - SWIR)/(NIR + SWIR))</strong></p>
+<hr />
+</div>
+<div id="difference-normalized-burn-index" class="section level2">
+<h2>Difference Normalized Burn Index</h2>
+<p>The Difference Normalized Burn Index (dNBR) is creates a measure of severity based upon pre-fire and post-fire vegetation conditions. Ideally to calculate dNBR, you will have imagery before very soon before the fire and very soon after the fire is out. The equation is as follows:</p>
+<p><strong>dNBR = Pre-fire NBR - Post-fire NBR</strong></p>
+<hr />
+</div>
+<div id="pine-gulch-fire" class="section level2">
+<h2>Pine Gulch Fire</h2>
+<p>Our study fire for this analysis and coding guide is the Pine Gulch fire of July 2020, located north of Grand Junction, Colorado.</p>
+<p><img src="D:/NR_6950/images/pinegulch.jpg" /></p>
+<pre class="r"><code>library(dplyr)
+library(terra)
+library(sf)
+library(raster)
+
+states &lt;- sf::st_read(&quot;D:/NR_6950/data/sf_datasets/state.shp&quot;)</code></pre>
+<pre><code>## Reading layer `state&#39; from data source `D:\NR_6950\data\sf_datasets\state.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 56 features and 4 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -179.1686 ymin: -14.59976 xmax: 179.7487 ymax: 71.38961
+## Geodetic CRS:  WGS 84</code></pre>
+<pre class="r"><code>Colorado &lt;- states %&gt;% 
+  filter(STATE == &quot;Colorado&quot;)
+
+Counties &lt;- sf::st_read(&quot;D:/NR_6950/data/sf_datasets/tl_2021_us_county.shp&quot;)</code></pre>
+<pre><code>## Reading layer `tl_2021_us_county&#39; from data source 
+##   `D:\NR_6950\data\sf_datasets\tl_2021_us_county.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 3234 features and 17 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -179.2311 ymin: -14.60181 xmax: 179.8597 ymax: 71.43979
+## Geodetic CRS:  NAD83</code></pre>
+<pre class="r"><code>mesa &lt;- Counties %&gt;% 
+  filter(NAME == &quot;Mesa&quot;)
+
+plot(Colorado$geometry, main = &quot;Mesa County, CO&quot;)
+plot(mesa$geometry, add = T, col = &quot;Blue&quot;)</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="coding-guide" class="section level2">
+<h2>Coding Guide</h2>
+<div id="libraries" class="section level3">
+<h3>Libraries</h3>
+<p>This analysis can be done completely using the package <em>terra</em>. However, we will jump around a few different packages for practice and to show you can do things a number of ways.</p>
+<p>Let’s load in our libraries:</p>
+<ul>
+<li><p>dplyr</p></li>
+<li><p>terra</p></li>
+<li><p>sf</p></li>
+<li><p>raster</p></li>
+</ul>
+<hr />
+</div>
+<div id="data" class="section level3">
+<h3>Data</h3>
+<p>The data provided to you this week is Landsat 8 imagery covering the Pine Gulch fire. Since the fire burned in late 07/20, I have pre-fire imagery from 06/20 and post-fire imagery from 09/20. I also have included a shapefile that contains the extent of North American wildfires in recent history. You’ll use this to select the area and location of a fire of your choice (this weeks assignment).</p>
+<p>Let’s take a look at the data.</p>
+<hr />
+<div id="list-files" class="section level4">
+<h4>List files</h4>
+<pre class="r"><code>list.files(&quot;D:/NR_6950/data/DNBR&quot;) # see what imagery we have</code></pre>
+<pre><code>##  [1] &quot;B1_post.TIF&quot; &quot;B1_pre.TIF&quot;  &quot;B2_post.TIF&quot; &quot;B2_pre.TIF&quot;  &quot;B3_post.TIF&quot;
+##  [6] &quot;B3_pre.TIF&quot;  &quot;B4_post.TIF&quot; &quot;B4_pre.TIF&quot;  &quot;B5_post.TIF&quot; &quot;B5_pre.TIF&quot; 
+## [11] &quot;B6_post.TIF&quot; &quot;B6_pre.TIF&quot;  &quot;B7_post.TIF&quot; &quot;B7_pre.TIF&quot;  &quot;fires&quot;</code></pre>
+<hr />
+</div>
+</div>
+<div id="wildfires" class="section level3">
+<h3>Wildfires</h3>
+<pre class="r"><code>fires &lt;- sf::st_read(&quot;D:/NR_6950/data/DNBR/fires/FH_Perimeter.shp&quot;)</code></pre>
+<pre><code>## Reading layer `FH_Perimeter&#39; from data source 
+##   `D:\NR_6950\data\DNBR\fires\FH_Perimeter.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 9652 features and 108 fields (with 4 geometries empty)
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -165.8152 ymin: 13.38021 xmax: 144.6906 ymax: 69.05174
+## Geodetic CRS:  WGS 84</code></pre>
+<pre class="r"><code>PG &lt;- fires %&gt;% 
+  filter(poly_Incid == &quot;Pine Gulch&quot;) # filter fire shapefile to pine gulch only
+plot(PG$geometry) # initial look</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>PG &lt;- sf::st_transform(PG, 32612) # to match the imagery CRS
+PG_v &lt;- as(PG, &quot;SpatVector&quot;) # turn it into a spatvector to work with spatraster</code></pre>
+<div id="pre-fire-vegetation-analysis" class="section level4">
+<h4>Pre-fire Vegetation Analysis</h4>
+<p>The band combination [4,3,2] produces an image in which vegetation is bright Red (as it absorbs green and blue). It can be incredibly useful in seperating imagery from other objects in the image.</p>
+<pre class="r"><code>pre_2 &lt;- terra::rast(&quot;D:/NR_6950/data/DNBR/B3_pre.tif&quot;) # band 3
+pre_3 &lt;- terra::rast(&quot;D:/NR_6950/data/DNBR/B4_pre.tif&quot;) # band 4
+pre_4 &lt;- terra::rast(&quot;D:/NR_6950/data/DNBR/B5_pre.tif&quot;) # band 5
+pre_nat &lt;- c(pre_2, pre_3, pre_4) # stack
+
+
+pre_nat &lt;- terra::crop(pre_nat, PG_v) # crop to the fire to minimize data used
+
+plotRGB(pre_nat, 3, 2, 1, stretch = &quot;lin&quot;) # plot</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="post-fire-vegetation-analysis" class="section level4">
+<h4>Post-fire Vegetation Analysis</h4>
+<pre class="r"><code># follow same process as pre-fire
+
+post_2 &lt;- terra::rast(&quot;D:/NR_6950/data/DNBR/B3_post.tif&quot;) 
+post_3 &lt;- terra::rast(&quot;D:/NR_6950/data/DNBR/B4_post.tif&quot;)
+post_4 &lt;- terra::rast(&quot;D:/NR_6950/data/DNBR/B5_post.tif&quot;)
+post_nat &lt;- c(post_2, post_3, post_4)
+
+
+post_nat &lt;- terra::crop(post_nat, PG_v)
+
+plotRGB(post_nat, 3, 2, 1, stretch = &quot;lin&quot;)</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<hr />
+</div>
+</div>
+<div id="organize-imagery" class="section level3">
+<h3>Organize Imagery</h3>
+<p>Let’s organize the imagery into to pre and post-fire so that we can create the NBR for each.</p>
+<pre class="r"><code>pre_5 &lt;- terra::rast(&quot;D:/NR_6950/data/DNBR/B5_pre.tif&quot;) # NIR
+pre_7 &lt;- terra::rast(&quot;D:/NR_6950/data/DNBR/B7_pre.tif&quot;) # SWIR 2
+post_5 &lt;- terra::rast(&quot;D:/NR_6950/data/DNBR/B5_post.tif&quot;) # NIR
+post_7 &lt;- terra::rast(&quot;D:/NR_6950/data/DNBR/B7_post.tif&quot;) # SWIR 2
+
+PG_pre &lt;- c(pre_5, pre_7) # stack
+PG_preC &lt;- terra::crop(PG_pre, PG_v) # Crop to fire
+
+PG_post &lt;- c(post_5, post_7)
+PG_postC &lt;- terra::crop(PG_post, PG_v)
+
+terra::plot(PG_preC) # initial look at bands</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>terra::plot(PG_postC)</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<hr />
+</div>
+<div id="pre-fire-nbr" class="section level3">
+<h3>Pre-fire NBR</h3>
+<p>Now that imagery is organized, let’s develop the equation for both the pre and post-fire NBR.</p>
+<pre class="r"><code>nbr_pre &lt;- ((PG_preC$B5_pre - PG_preC$B7_pre)/(PG_preC$B5_pre + PG_preC$B7_pre))
+
+plot(nbr_pre, main = &quot;Pre Fire&quot;)
+plot(PG_v, add = T)</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="post-fire-nbr" class="section level3">
+<h3>Post-fire NBR</h3>
+<pre class="r"><code>nbr_post &lt;- ((PG_postC$B5_post - PG_postC$B7_post)/(PG_postC$B5_post + PG_postC$B7_post))
+
+plot(nbr_post, main = &quot;Post Fire&quot;)
+plot(PG_v, add = T)</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="dnbi" class="section level3">
+<h3>dNBI</h3>
+<p>To calculate dNBR, all we need to do is subtract post-fire NBR from pre-fire NBR.</p>
+<pre class="r"><code>ndbi &lt;- nbr_pre - nbr_post # pre-post
+terra::plot(ndbi)</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<hr />
+<div id="organize-and-reclassify-dnbr" class="section level4">
+<h4>Organize and Reclassify dNBR</h4>
+<p>The output of the dNBR comes to us in a continuous scale. Also, with the default colors, we don’t immediately connect with the imagery as burn. Let’s classify our image to create classes that will assign certain values of the final product to fire severity.</p>
+<pre class="r"><code>ndbi &lt;- terra::mask(ndbi, PG_v) # mask to fire for looks post analysis
+
+ndbi_R &lt;- as(ndbi, &quot;Raster&quot;) # let&#39;s try it as a raster
+
+
+plot(ndbi_R)</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>ndbi_class &lt;- raster::reclassify(ndbi_R, # reclassify = Lower,Upper,Class#
+                                 c(-1,-.1,1, # regrowth
+                                   -.1,.1,2, # unburned
+                                   .1,.25,3, # low
+                                   .25,.5,4, # moderate
+                                   .5, 1, 5))# high
+plot(ndbi_class) # plot</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+<hr />
+</div>
+</div>
+<div id="final-plot-and-cartogtaphy" class="section level3">
+<h3>Final Plot and Cartogtaphy</h3>
+<p>Let’s give our final plot some color that we mentally associated with burned vegetation.</p>
+<pre class="r"><code>plot(ndbi_class,
+     legend = FALSE,
+     col = c(&quot;light green&quot;, &quot;dark green&quot;, &quot;yellow&quot;, &quot;red&quot;, &quot;purple&quot;), axes = FALSE,
+     main = &quot;Normalized Difference Burn Index - Pine Gulch Fire, Colorado&quot;,
+     bty = &quot;n&quot;,
+     box = F) # remove plot box
+
+
+legend(&quot;bottomright&quot;, # legend location
+       legend = c(&quot;Enhanced Regrowth&quot;, &quot;Unburned&quot;, &quot;Low Severity&quot;, &quot;Medium Severity&quot;, &quot;High Severity&quot;),
+       fill = c(&quot;light green&quot;, &quot;dark green&quot;, &quot;yellow&quot;, &quot;red&quot;, &quot;purple&quot;),
+       border = T,
+       bty = &quot;n&quot;,
+       inset = c(-0.15, 0), # move legend
+       xpd = T) # turn off legend border
+plot(PG$geometry, add = T)</code></pre>
+<p><img src="Burn_ratio_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
