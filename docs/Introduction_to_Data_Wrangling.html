@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Josh Carrell - Utah State University, MS Ecology" />
+
+
+<title>Introduction to Data Wrangling &amp; Descriptive Statistics: Coding Guide</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">NR 6950: Geospatial Analysis for Natural Resources</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    R Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_R_Programming.html">Intro to R</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Wrangling.html">Intro to Data Wrangling</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Visualization.html">Intro to Data Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Geospatial Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_Geospatial_Data_Coordinate_Systems.html">Introduction to Coordinate Systems</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Vector_Data.html">Introduction to Spatial Vector Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Raster_Data.html">Introduction to Spatial Raster Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Remote_Sensing.html">Introduction to Remote Sensing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Advanced Geospatial Topics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Point_Pattern_Analysis.html">Point Pattern Analysis</a>
+    </li>
+    <li>
+      <a href="Burn_ratio.html">Remote Sensing: Difference Normalized Burn Ratio</a>
+    </li>
+    <li>
+      <a href="Species_Distribution_Modeling.html">Species Distribution Modeling</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Introduction to Data Wrangling &amp; Descriptive Statistics: Coding Guide</h1>
+<h4 class="author">Josh Carrell - Utah State University, MS Ecology</h4>
+<h4 class="date">Last Update: May 13, 2022</h4>
+
+</div>
+
+
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>For this week’s coding guide (and assignment!) we are going to use data from several different sources. Some are not natural resource related but they are good datasets anyhow!</p>
+<p>We’ll be working with the following data for this coding guide and some for our assignments:</p>
+<ol style="list-style-type: decimal">
+<li><p>Mental health survey of tech industry professionals. CSV format. Found in week 2 module for download.</p></li>
+<li><p>The iris dataset. Already pre-built in R.</p></li>
+<li><p>beaver1. This dataset comes from the <strong>datasets</strong> package.</p></li>
+</ol>
+<p>I’ll show you how to load all this data as we go through the code below.</p>
+<hr />
+</div>
+<div id="data-wrangling" class="section level1">
+<h1>Data Wrangling</h1>
+<p>Data Wrangling is the process of cleaning and unifying messy and complex data sets for easy access and analysis. When working on a project with many stakeholders, our data often comes from various sources. This means you may be working with several data structuring formats, missing values, and incorrect information.</p>
+<p>We’re going to walk through some of the very common methods and functions used for Data Wrangling.</p>
+<hr />
+<div id="explore-the-data" class="section level2">
+<h2>Explore the Data</h2>
+<p>The data is in the week 2 module as “survey.csv”.</p>
+<p>To load a csv in R, use the read.csv() function and direct R to load the data from a specific address in your files. See below in the code:</p>
+<pre class="r"><code>survey &lt;- read.csv(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/DataWrangling/survey.csv&quot;) # Load data - this will be a different pathway for you.
+head(survey,5) # View first 5 rows of dataset using the head() function</code></pre>
+<pre><code>##         Timestamp Age Gender        Country state self_employed family_history
+## 1 8/27/2014 11:29  37 Female  United States    IL          &lt;NA&gt;             No
+## 2 8/27/2014 11:29  44      M  United States    IN          &lt;NA&gt;             No
+## 3 8/27/2014 11:29  32   Male         Canada  &lt;NA&gt;          &lt;NA&gt;             No
+## 4 8/27/2014 11:29  31   Male United Kingdom  &lt;NA&gt;          &lt;NA&gt;            Yes
+## 5 8/27/2014 11:30  31   Male  United States    TX          &lt;NA&gt;             No
+##   treatment work_interfere   no_employees remote_work tech_company   benefits
+## 1       Yes          Often         25-Jun          No          Yes        Yes
+## 2        No         Rarely More than 1000          No           No Don&#39;t know
+## 3        No         Rarely         25-Jun          No          Yes         No
+## 4       Yes          Often         26-100          No          Yes         No
+## 5        No          Never        100-500         Yes          Yes        Yes
+##   care_options wellness_program  seek_help  anonymity              leave
+## 1     Not sure               No        Yes        Yes      Somewhat easy
+## 2           No       Don&#39;t know Don&#39;t know Don&#39;t know         Don&#39;t know
+## 3           No               No         No Don&#39;t know Somewhat difficult
+## 4          Yes               No         No         No Somewhat difficult
+## 5           No       Don&#39;t know Don&#39;t know Don&#39;t know         Don&#39;t know
+##   mental_health_consequence phys_health_consequence    coworkers supervisor
+## 1                        No                      No Some of them        Yes
+## 2                     Maybe                      No           No         No
+## 3                        No                      No          Yes        Yes
+## 4                       Yes                     Yes Some of them         No
+## 5                        No                      No Some of them        Yes
+##   mental_health_interview phys_health_interview mental_vs_physical
+## 1                      No                 Maybe                Yes
+## 2                      No                    No         Don&#39;t know
+## 3                     Yes                   Yes                 No
+## 4                   Maybe                 Maybe                 No
+## 5                     Yes                   Yes         Don&#39;t know
+##   obs_consequence comments
+## 1              No     &lt;NA&gt;
+## 2              No     &lt;NA&gt;
+## 3              No     &lt;NA&gt;
+## 4             Yes     &lt;NA&gt;
+## 5              No     &lt;NA&gt;</code></pre>
+<p>Looking at the data above, it’s pretty messy. It’s also a very large dataset. It’d be easy to get lost just by scanning through this information in excel. Luckily R has a few build in function to make our lives easier when exploring the structure of newly acquired data.</p>
+<hr />
+<div id="dim" class="section level3">
+<h3>dim()</h3>
+<p>The dim() function stands for dimensions and allows us to look at the dimensions of a dataset. The results look like this: Number of Rows x Number of Columns.</p>
+<pre class="r"><code>dim(survey) # view dimensions</code></pre>
+<pre><code>## [1] 1259   27</code></pre>
+<hr />
+</div>
+<div id="names" class="section level3">
+<h3>names()</h3>
+<p>a simple function for looking at the column names of the dataset.</p>
+<pre class="r"><code>names(survey)</code></pre>
+<pre><code>##  [1] &quot;Timestamp&quot;                 &quot;Age&quot;                      
+##  [3] &quot;Gender&quot;                    &quot;Country&quot;                  
+##  [5] &quot;state&quot;                     &quot;self_employed&quot;            
+##  [7] &quot;family_history&quot;            &quot;treatment&quot;                
+##  [9] &quot;work_interfere&quot;            &quot;no_employees&quot;             
+## [11] &quot;remote_work&quot;               &quot;tech_company&quot;             
+## [13] &quot;benefits&quot;                  &quot;care_options&quot;             
+## [15] &quot;wellness_program&quot;          &quot;seek_help&quot;                
+## [17] &quot;anonymity&quot;                 &quot;leave&quot;                    
+## [19] &quot;mental_health_consequence&quot; &quot;phys_health_consequence&quot;  
+## [21] &quot;coworkers&quot;                 &quot;supervisor&quot;               
+## [23] &quot;mental_health_interview&quot;   &quot;phys_health_interview&quot;    
+## [25] &quot;mental_vs_physical&quot;        &quot;obs_consequence&quot;          
+## [27] &quot;comments&quot;</code></pre>
+<hr />
+</div>
+<div id="head-and-tail" class="section level3">
+<h3>head() and tail()</h3>
+<p>Head and tail sounds like a horse shampoo. They’re actually made for viewing the beginnings and endings of datasets. head() looking at the beginning; tail() looks at the end.</p>
+<p>Lets view the first 10 rows and the last 7 rows of our data.</p>
+<pre class="r"><code>head(survey, 10) # looks at first 10</code></pre>
+<pre><code>##          Timestamp Age Gender        Country state self_employed family_history
+## 1  8/27/2014 11:29  37 Female  United States    IL          &lt;NA&gt;             No
+## 2  8/27/2014 11:29  44      M  United States    IN          &lt;NA&gt;             No
+## 3  8/27/2014 11:29  32   Male         Canada  &lt;NA&gt;          &lt;NA&gt;             No
+## 4  8/27/2014 11:29  31   Male United Kingdom  &lt;NA&gt;          &lt;NA&gt;            Yes
+## 5  8/27/2014 11:30  31   Male  United States    TX          &lt;NA&gt;             No
+## 6  8/27/2014 11:31  33   Male  United States    TN          &lt;NA&gt;            Yes
+## 7  8/27/2014 11:31  35 Female  United States    MI          &lt;NA&gt;            Yes
+## 8  8/27/2014 11:32  39      M         Canada  &lt;NA&gt;          &lt;NA&gt;             No
+## 9  8/27/2014 11:32  42 Female  United States    IL          &lt;NA&gt;            Yes
+## 10 8/27/2014 11:32  23   Male         Canada  &lt;NA&gt;          &lt;NA&gt;             No
+##    treatment work_interfere   no_employees remote_work tech_company   benefits
+## 1        Yes          Often         25-Jun          No          Yes        Yes
+## 2         No         Rarely More than 1000          No           No Don&#39;t know
+## 3         No         Rarely         25-Jun          No          Yes         No
+## 4        Yes          Often         26-100          No          Yes         No
+## 5         No          Never        100-500         Yes          Yes        Yes
+## 6         No      Sometimes         25-Jun          No          Yes        Yes
+## 7        Yes      Sometimes          5-Jan         Yes          Yes         No
+## 8         No          Never          5-Jan         Yes          Yes         No
+## 9        Yes      Sometimes        100-500          No          Yes        Yes
+## 10        No          Never         26-100          No          Yes Don&#39;t know
+##    care_options wellness_program  seek_help  anonymity              leave
+## 1      Not sure               No        Yes        Yes      Somewhat easy
+## 2            No       Don&#39;t know Don&#39;t know Don&#39;t know         Don&#39;t know
+## 3            No               No         No Don&#39;t know Somewhat difficult
+## 4           Yes               No         No         No Somewhat difficult
+## 5            No       Don&#39;t know Don&#39;t know Don&#39;t know         Don&#39;t know
+## 6      Not sure               No Don&#39;t know Don&#39;t know         Don&#39;t know
+## 7            No               No         No         No Somewhat difficult
+## 8           Yes               No         No        Yes         Don&#39;t know
+## 9           Yes               No         No         No     Very difficult
+## 10           No       Don&#39;t know Don&#39;t know Don&#39;t know         Don&#39;t know
+##    mental_health_consequence phys_health_consequence    coworkers supervisor
+## 1                         No                      No Some of them        Yes
+## 2                      Maybe                      No           No         No
+## 3                         No                      No          Yes        Yes
+## 4                        Yes                     Yes Some of them         No
+## 5                         No                      No Some of them        Yes
+## 6                         No                      No          Yes        Yes
+## 7                      Maybe                   Maybe Some of them         No
+## 8                         No                      No           No         No
+## 9                      Maybe                      No          Yes        Yes
+## 10                        No                      No          Yes        Yes
+##    mental_health_interview phys_health_interview mental_vs_physical
+## 1                       No                 Maybe                Yes
+## 2                       No                    No         Don&#39;t know
+## 3                      Yes                   Yes                 No
+## 4                    Maybe                 Maybe                 No
+## 5                      Yes                   Yes         Don&#39;t know
+## 6                       No                 Maybe         Don&#39;t know
+## 7                       No                    No         Don&#39;t know
+## 8                       No                    No                 No
+## 9                       No                 Maybe                 No
+## 10                   Maybe                 Maybe                Yes
+##    obs_consequence comments
+## 1               No     &lt;NA&gt;
+## 2               No     &lt;NA&gt;
+## 3               No     &lt;NA&gt;
+## 4              Yes     &lt;NA&gt;
+## 5               No     &lt;NA&gt;
+## 6               No     &lt;NA&gt;
+## 7               No     &lt;NA&gt;
+## 8               No     &lt;NA&gt;
+## 9               No     &lt;NA&gt;
+## 10              No     &lt;NA&gt;</code></pre>
+<pre class="r"><code>tail(survey, 7) # looks at last 7</code></pre>
+<pre><code>##             Timestamp Age Gender        Country state self_employed
+## 1253  8/20/2015 16:52  29   male  United States    NC            No
+## 1254  8/25/2015 19:59  36   Male  United States    UT            No
+## 1255  9/12/2015 11:17  26   male United Kingdom  &lt;NA&gt;            No
+## 1256   9/26/2015 1:07  32   Male  United States    IL            No
+## 1257  11/7/2015 12:36  34   male  United States    CA            No
+## 1258 11/30/2015 21:25  46      f  United States    NC            No
+## 1259   2/1/2016 23:04  25   Male  United States    IL            No
+##      family_history treatment work_interfere   no_employees remote_work
+## 1253            Yes       Yes      Sometimes        100-500         Yes
+## 1254            Yes        No         Rarely More than 1000          No
+## 1255             No       Yes           &lt;NA&gt;         26-100          No
+## 1256            Yes       Yes          Often         26-100         Yes
+## 1257            Yes       Yes      Sometimes More than 1000          No
+## 1258             No        No           &lt;NA&gt;        100-500         Yes
+## 1259            Yes       Yes      Sometimes         26-100          No
+##      tech_company   benefits care_options wellness_program seek_help  anonymity
+## 1253          Yes        Yes          Yes              Yes        No        Yes
+## 1254           No Don&#39;t know           No              Yes       Yes Don&#39;t know
+## 1255          Yes         No           No               No        No Don&#39;t know
+## 1256          Yes        Yes          Yes               No        No        Yes
+## 1257          Yes        Yes          Yes               No        No Don&#39;t know
+## 1258          Yes         No          Yes               No        No Don&#39;t know
+## 1259           No        Yes          Yes               No        No        Yes
+##                   leave mental_health_consequence phys_health_consequence
+## 1253         Don&#39;t know                       Yes                      No
+## 1254      Somewhat easy                     Maybe                   Maybe
+## 1255      Somewhat easy                        No                      No
+## 1256 Somewhat difficult                        No                      No
+## 1257 Somewhat difficult                       Yes                     Yes
+## 1258         Don&#39;t know                       Yes                      No
+## 1259         Don&#39;t know                     Maybe                      No
+##         coworkers   supervisor mental_health_interview phys_health_interview
+## 1253 Some of them           No                      No                 Maybe
+## 1254 Some of them Some of them                      No                    No
+## 1255 Some of them Some of them                      No                    No
+## 1256 Some of them          Yes                      No                    No
+## 1257           No           No                      No                    No
+## 1258           No           No                      No                    No
+## 1259 Some of them           No                      No                    No
+##      mental_vs_physical obs_consequence comments
+## 1253                 No              No     &lt;NA&gt;
+## 1254         Don&#39;t know              No     &lt;NA&gt;
+## 1255         Don&#39;t know              No     &lt;NA&gt;
+## 1256                Yes              No     &lt;NA&gt;
+## 1257                 No              No     &lt;NA&gt;
+## 1258                 No              No     &lt;NA&gt;
+## 1259         Don&#39;t know              No     &lt;NA&gt;</code></pre>
+<hr />
+</div>
+<div id="str" class="section level3">
+<h3>str()</h3>
+<p>str() stands for structure. This function allows to compactly display the structure of an R object, in this case our survey data.</p>
+<p>Running str(survey) will give us the column names, the class type of each column (remember week 1) and the first few rows of data for each column.</p>
+<pre class="r"><code>str(survey)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    1259 obs. of  27 variables:
+##  $ Timestamp                : chr  &quot;8/27/2014 11:29&quot; &quot;8/27/2014 11:29&quot; &quot;8/27/2014 11:29&quot; &quot;8/27/2014 11:29&quot; ...
+##  $ Age                      : num  37 44 32 31 31 33 35 39 42 23 ...
+##  $ Gender                   : chr  &quot;Female&quot; &quot;M&quot; &quot;Male&quot; &quot;Male&quot; ...
+##  $ Country                  : chr  &quot;United States&quot; &quot;United States&quot; &quot;Canada&quot; &quot;United Kingdom&quot; ...
+##  $ state                    : chr  &quot;IL&quot; &quot;IN&quot; NA NA ...
+##  $ self_employed            : chr  NA NA NA NA ...
+##  $ family_history           : chr  &quot;No&quot; &quot;No&quot; &quot;No&quot; &quot;Yes&quot; ...
+##  $ treatment                : chr  &quot;Yes&quot; &quot;No&quot; &quot;No&quot; &quot;Yes&quot; ...
+##  $ work_interfere           : chr  &quot;Often&quot; &quot;Rarely&quot; &quot;Rarely&quot; &quot;Often&quot; ...
+##  $ no_employees             : chr  &quot;25-Jun&quot; &quot;More than 1000&quot; &quot;25-Jun&quot; &quot;26-100&quot; ...
+##  $ remote_work              : chr  &quot;No&quot; &quot;No&quot; &quot;No&quot; &quot;No&quot; ...
+##  $ tech_company             : chr  &quot;Yes&quot; &quot;No&quot; &quot;Yes&quot; &quot;Yes&quot; ...
+##  $ benefits                 : chr  &quot;Yes&quot; &quot;Don&#39;t know&quot; &quot;No&quot; &quot;No&quot; ...
+##  $ care_options             : chr  &quot;Not sure&quot; &quot;No&quot; &quot;No&quot; &quot;Yes&quot; ...
+##  $ wellness_program         : chr  &quot;No&quot; &quot;Don&#39;t know&quot; &quot;No&quot; &quot;No&quot; ...
+##  $ seek_help                : chr  &quot;Yes&quot; &quot;Don&#39;t know&quot; &quot;No&quot; &quot;No&quot; ...
+##  $ anonymity                : chr  &quot;Yes&quot; &quot;Don&#39;t know&quot; &quot;Don&#39;t know&quot; &quot;No&quot; ...
+##  $ leave                    : chr  &quot;Somewhat easy&quot; &quot;Don&#39;t know&quot; &quot;Somewhat difficult&quot; &quot;Somewhat difficult&quot; ...
+##  $ mental_health_consequence: chr  &quot;No&quot; &quot;Maybe&quot; &quot;No&quot; &quot;Yes&quot; ...
+##  $ phys_health_consequence  : chr  &quot;No&quot; &quot;No&quot; &quot;No&quot; &quot;Yes&quot; ...
+##  $ coworkers                : chr  &quot;Some of them&quot; &quot;No&quot; &quot;Yes&quot; &quot;Some of them&quot; ...
+##  $ supervisor               : chr  &quot;Yes&quot; &quot;No&quot; &quot;Yes&quot; &quot;No&quot; ...
+##  $ mental_health_interview  : chr  &quot;No&quot; &quot;No&quot; &quot;Yes&quot; &quot;Maybe&quot; ...
+##  $ phys_health_interview    : chr  &quot;Maybe&quot; &quot;No&quot; &quot;Yes&quot; &quot;Maybe&quot; ...
+##  $ mental_vs_physical       : chr  &quot;Yes&quot; &quot;Don&#39;t know&quot; &quot;No&quot; &quot;No&quot; ...
+##  $ obs_consequence          : chr  &quot;No&quot; &quot;No&quot; &quot;No&quot; &quot;Yes&quot; ...
+##  $ comments                 : chr  NA NA NA NA ...</code></pre>
+<hr />
+</div>
+<div id="is.na" class="section level3">
+<h3>is.na()</h3>
+<p>is.na() stands for “are there any null/not available values in the data?”. Using this function means we’re just looking to see if anything is missing. If there is a missing value, the response will be TRUE. If there is a value, the response is FALSE.</p>
+<p>I wont run the code in this document but you will in your R script.</p>
+<p>Run the following code in your R script: is.na(survey)</p>
+<p>What happened? It ran through the entire dataset responding to each cell whether it was null or had information. Pretty terrible to look at and not really helpful if we want to see how many null values or where those null values are. Luckily, table() helps us solve that.</p>
+<hr />
+</div>
+<div id="table" class="section level3">
+<h3>table()</h3>
+<p>table() identifies the quantity of values in a given dataset and column. Let’s run table() around our is.na() function on the survey data.</p>
+<pre class="r"><code>table(is.na(survey))</code></pre>
+<pre><code>## 
+## FALSE  TRUE 
+## 32101  1892</code></pre>
+<p>Way freaking easier. There are 1892 missing values in our dataset.</p>
+<p>Lets use table() to check individual columns.</p>
+<pre class="r"><code>table(is.na(survey$Age)) # checking age for NA&#39;s</code></pre>
+<pre><code>## 
+## FALSE 
+##  1259</code></pre>
+<pre class="r"><code>table(is.na(survey$comments)) # checking comments for NA&#39;s</code></pre>
+<pre><code>## 
+## FALSE  TRUE 
+##   164  1095</code></pre>
+<p>So for age, there were zero rows left blank. How many blanks were left in the comments?</p>
+<p>NOTE: table() isn’t only for finding NA’s. This function allows you to see each row data per column and their quantity. Lets see the gender reponse of each survey participant.</p>
+<pre class="r"><code>table(survey$Gender) # Gender responses</code></pre>
+<pre><code>## 
+##                             A little about you 
+##                                              1 
+##                                        Agender 
+##                                              1 
+##                                            All 
+##                                              1 
+##                                      Androgyne 
+##                                              1 
+##                               cis-female/femme 
+##                                              1 
+##                                     Cis Female 
+##                                              1 
+##                                       cis male 
+##                                              1 
+##                                       Cis Male 
+##                                              2 
+##                                        Cis Man 
+##                                              1 
+##                                           Enby 
+##                                              1 
+##                                              f 
+##                                             15 
+##                                              F 
+##                                             38 
+##                                         femail 
+##                                              1 
+##                                         Femake 
+##                                              1 
+##                                         female 
+##                                             62 
+##                                         Female 
+##                                            121 
+##                                        Female  
+##                                              2 
+##                                   Female (cis) 
+##                                              1 
+##                                 Female (trans) 
+##                                              2 
+##                                          fluid 
+##                                              1 
+##                                    Genderqueer 
+##                                              1 
+##                                 Guy (-ish) ^_^ 
+##                                              1 
+##                                              m 
+##                                             34 
+##                                              M 
+##                                            116 
+##                                           Mail 
+##                                              1 
+##                                          maile 
+##                                              1 
+##                                           Make 
+##                                              4 
+##                                            Mal 
+##                                              1 
+##                                           male 
+##                                            206 
+##                                           Male 
+##                                            615 
+##                                       Male-ish 
+##                                              1 
+##                                          Male  
+##                                              3 
+##                                     Male (CIS) 
+##                                              1 
+##                       male leaning androgynous 
+##                                              1 
+##                                           Malr 
+##                                              1 
+##                                            Man 
+##                                              2 
+##                                           msle 
+##                                              1 
+##                                            Nah 
+##                                              1 
+##                                         Neuter 
+##                                              1 
+##                                     non-binary 
+##                                              1 
+## ostensibly male, unsure what that really means 
+##                                              1 
+##                                              p 
+##                                              1 
+##                                          queer 
+##                                              1 
+##                                 queer/she/they 
+##                                              1 
+##                          something kinda male? 
+##                                              1 
+##                                   Trans-female 
+##                                              1 
+##                                    Trans woman 
+##                                              1 
+##                                          woman 
+##                                              1 
+##                                          Woman 
+##                                              3</code></pre>
+<pre class="r"><code>length(unique(survey$Gender)) # code bonus: view how many unique responses there were.</code></pre>
+<pre><code>## [1] 49</code></pre>
+<p>There were quite a few different answers and some misspellings. We can use the tidyverse to work with that.</p>
+<hr />
+</div>
+</div>
+<div id="manipulate-the-data" class="section level2">
+<h2>Manipulate the Data</h2>
+<p>For this section, we’re going to use another dataset, <strong>iris</strong>. If you remember from week 1, we briefly used this dataset. To refresh yourself, feel free to code: ?iris</p>
+<hr />
+<div id="the-tidyverse" class="section level3">
+<h3>The tidyverse</h3>
+<p>We will be using what is called <strong>the tidyverse</strong>.</p>
+<p>The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures. - tidyverse.org</p>
+<p>You’ll notice when you install and load the tidyverse packages, several packages will upload. Each package brings functions that are helpful in data science and data wrangling.</p>
+<p>Let’s install.</p>
+<pre class="r"><code># install.packages(&quot;tidyverse&quot;) # if never done before
+library(tidyverse) # load</code></pre>
+<hr />
+</div>
+<div id="dplyr" class="section level3">
+<h3>dplyr</h3>
+<p>dplyr is a package that makes part of the larger tidyverse. dplyr is a grammar of data manipulation, providing a consistent set of verbs that help you solve the most common data manipulation challenges. - <a href="https://dplyr.tidyverse.org/" class="uri">https://dplyr.tidyverse.org/</a></p>
+<p>We will go through the major functions of dplyr.</p>
+<hr />
+</div>
+<div id="piping" class="section level3">
+<h3>piping ( %&gt;% )</h3>
+<p>%&gt;% is called the forward pipe operator. Essentially it means by using this symbol after a dataset, we want to directly add functions applied to that dataset. Pipes let you take the output of one function and send it directly to the next.</p>
+<p>Pay attention to the code and look for the %&gt;%. As we go througt the code it should be much more clear on how to use them. If not, please feel free to come to zoom hours or Google “piping in dplyr”.</p>
+<p>Note: a short cut to making the %&gt;% symbol:</p>
+<ul>
+<li><p>on windows: ctrl+shift+m</p></li>
+<li><p>on mac: command+shift+m</p></li>
+</ul>
+<hr />
+</div>
+<div id="select" class="section level3">
+<h3>select()</h3>
+<p>select() picks variables based on their names.</p>
+<p>Lets create a new variable called iris_select and let’s say we only want to look at the following:</p>
+<ul>
+<li><p>Species</p></li>
+<li><p>Petal Length</p></li>
+<li><p>Petal Width</p></li>
+</ul>
+<pre class="r"><code>names(iris) # Call column names</code></pre>
+<pre><code>## [1] &quot;Sepal.Length&quot; &quot;Sepal.Width&quot;  &quot;Petal.Length&quot; &quot;Petal.Width&quot;  &quot;Species&quot;</code></pre>
+<pre class="r"><code>iris_select &lt;- iris %&gt;%              # create new variable from survey data,add pipe to add function
+  select(Species, Petal.Length, Petal.Width)# select() function. Select the specific columns of interest
+names(iris_select) # column names of newly created dataset of selected columns</code></pre>
+<pre><code>## [1] &quot;Species&quot;      &quot;Petal.Length&quot; &quot;Petal.Width&quot;</code></pre>
+<pre class="r"><code>head(iris_select, 5) # check out the new data with 5 rows</code></pre>
+<pre><code>##   Species Petal.Length Petal.Width
+## 1  setosa          1.4         0.2
+## 2  setosa          1.4         0.2
+## 3  setosa          1.3         0.2
+## 4  setosa          1.5         0.2
+## 5  setosa          1.4         0.2</code></pre>
+<p>We see that using the piping and the select function, we were able to create a new dataset with our desired columns directly from the survey dataset.</p>
+<hr />
+</div>
+<div id="mutate" class="section level3">
+<h3>mutate()</h3>
+<p>mutate() allows for the creation of new variables that are functions of existing variables. Basically we can create new columns in our existing data based on conditions or equations from other columns.</p>
+<p>Lets create a new column in iris_select called Times.Bigger. This column should reflect how many times bigger in centimeters the petal length is than the petal width for each flower.</p>
+<pre class="r"><code>iris_select &lt;- iris %&gt;% # Call from iris
+  select(Species, Petal.Length, Petal.Width) %&gt;%    # Select our columns of interest
+  mutate(Times.Bigger = (Petal.Length/Petal.Width)) # Create new column, set = to condition/function
+
+names(iris_select) # Check names, notice the new column</code></pre>
+<pre><code>## [1] &quot;Species&quot;      &quot;Petal.Length&quot; &quot;Petal.Width&quot;  &quot;Times.Bigger&quot;</code></pre>
+<pre class="r"><code>head(iris_select, 5) # Does the column look right? it worked!</code></pre>
+<pre><code>##   Species Petal.Length Petal.Width Times.Bigger
+## 1  setosa          1.4         0.2          7.0
+## 2  setosa          1.4         0.2          7.0
+## 3  setosa          1.3         0.2          6.5
+## 4  setosa          1.5         0.2          7.5
+## 5  setosa          1.4         0.2          7.0</code></pre>
+</div>
+<div id="filter" class="section level3">
+<h3>filter()</h3>
+<p>filter() does exactly what it sounds like. This function allows us to filter through our dataset based on columns, values, and conditions.</p>
+<p>For this example, lets use filter() to make a new dataset called setosa_small that is populated with only data of the setosa species with sepal lengths smaller than 5.</p>
+<p>We can do this by running conditions inside the filter() function.</p>
+<p>To filter by specific value, use 2 equal signs (==) and set the column name to the value. In this case, Species will equal setosa (Species == “setosa”). NOTE: Since setosa is a character string, you must include quotation marks.</p>
+<p>To filter in a numeric condition, use a mathematical operator. In this case, we want sepal length less than 5 (Sepal.Length &lt; 5). NOTE: Sepal length has numeric values, no quotations as it is not a character.</p>
+<p><strong>Lets run both conditions in the same function. String conditions together with the % symbol</strong>.</p>
+<pre class="r"><code>setosa_small &lt;- iris %&gt;%         # create from iris dataset
+  filter(Species == &quot;setosa&quot; &amp; Sepal.Length &lt; 5) # filter for species name and sepal length under 5
+
+setosa_small # view the new dataset</code></pre>
+<pre><code>##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1           4.9         3.0          1.4         0.2  setosa
+## 2           4.7         3.2          1.3         0.2  setosa
+## 3           4.6         3.1          1.5         0.2  setosa
+## 4           4.6         3.4          1.4         0.3  setosa
+## 5           4.4         2.9          1.4         0.2  setosa
+## 6           4.9         3.1          1.5         0.1  setosa
+## 7           4.8         3.4          1.6         0.2  setosa
+## 8           4.8         3.0          1.4         0.1  setosa
+## 9           4.3         3.0          1.1         0.1  setosa
+## 10          4.6         3.6          1.0         0.2  setosa
+## 11          4.8         3.4          1.9         0.2  setosa
+## 12          4.7         3.2          1.6         0.2  setosa
+## 13          4.8         3.1          1.6         0.2  setosa
+## 14          4.9         3.1          1.5         0.2  setosa
+## 15          4.9         3.6          1.4         0.1  setosa
+## 16          4.4         3.0          1.3         0.2  setosa
+## 17          4.5         2.3          1.3         0.3  setosa
+## 18          4.4         3.2          1.3         0.2  setosa
+## 19          4.8         3.0          1.4         0.3  setosa
+## 20          4.6         3.2          1.4         0.2  setosa</code></pre>
+</div>
+<div id="summarise" class="section level3">
+<h3>summarise()</h3>
+<p>summarise() creates a new data frame. It will have one (or more) rows for each combination of grouping variables; if there are no grouping variables, the output will have a single row summarising all observations in the input. It will contain one column for each grouping variable and one column for each of the summary statistics that you have specified. - <a href="https://dplyr.tidyverse.org/reference/summarise.html" class="uri">https://dplyr.tidyverse.org/reference/summarise.html</a></p>
+<p>Basically summarise() allows us to view statistics of specific columns in a new dataset. You can use any of the descriptive statistic functions you will learn below in the Descriptive Statistics portion.</p>
+<p>let’s make a new data frame called species_sepals that has the mean, max, and min values of sepal width.</p>
+<pre class="r"><code>iris %&gt;%  # call from iris data
+  summarise(mean(Sepal.Width), max(Sepal.Width), min(Sepal.Width)) # run functions, each will be new col.</code></pre>
+<pre><code>##   mean(Sepal.Width) max(Sepal.Width) min(Sepal.Width)
+## 1          3.057333              4.4                2</code></pre>
+<p>How did it turn out? We got the values we needed but the values are for the whole dataset, not broken up by species. Let’s use the group_by function.</p>
+<hr />
+</div>
+<div id="group_by" class="section level3">
+<h3>group_by()</h3>
+<p>The group_by() function allows us to break up our dataset by a specific value. Above we wanted to see the mean, max, and min values of sepa width by species. We can use group_by(Species) for this to work.</p>
+<pre class="r"><code>iris %&gt;%  # call from iris data
+  group_by(Species) %&gt;% 
+  summarise(mean(Sepal.Width), max(Sepal.Width), min(Sepal.Width)) # run functions, each will be new col.</code></pre>
+<pre><code>## # A tibble: 3 x 4
+##   Species    `mean(Sepal.Width)` `max(Sepal.Width)` `min(Sepal.Width)`
+##   &lt;fct&gt;                    &lt;dbl&gt;              &lt;dbl&gt;              &lt;dbl&gt;
+## 1 setosa                    3.43                4.4                2.3
+## 2 versicolor                2.77                3.4                2  
+## 3 virginica                 2.97                3.8                2.2</code></pre>
+<hr />
+</div>
+<div id="arrange" class="section level3">
+<h3>arrange()</h3>
+<p>arrange() allows us to rearrange our data based on certain conditions. Let’s create a new dataset called virginica that contains only the virginica species, has sepal widths greater than 2.9, and is arranged in descending sepal lengths (we will use the desc() function).</p>
+<p>NOTE: desc() stands for descending. It will places the rows in descending order.</p>
+<pre class="r"><code>iris_new &lt;- iris %&gt;% # call from iris data
+  filter(Species == &quot;virginica&quot; &amp; Sepal.Width &gt; 2.9) %&gt;% # filter species and sepal width
+  arrange(desc(Sepal.Length)) # arrange the data by descending values in sepal length
+
+iris_new # view the new data frame</code></pre>
+<pre><code>##    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+## 1           7.9         3.8          6.4         2.0 virginica
+## 2           7.7         3.8          6.7         2.2 virginica
+## 3           7.7         3.0          6.1         2.3 virginica
+## 4           7.6         3.0          6.6         2.1 virginica
+## 5           7.2         3.6          6.1         2.5 virginica
+## 6           7.2         3.2          6.0         1.8 virginica
+## 7           7.2         3.0          5.8         1.6 virginica
+## 8           7.1         3.0          5.9         2.1 virginica
+## 9           6.9         3.2          5.7         2.3 virginica
+## 10          6.9         3.1          5.4         2.1 virginica
+## 11          6.9         3.1          5.1         2.3 virginica
+## 12          6.8         3.0          5.5         2.1 virginica
+## 13          6.8         3.2          5.9         2.3 virginica
+## 14          6.7         3.3          5.7         2.1 virginica
+## 15          6.7         3.1          5.6         2.4 virginica
+## 16          6.7         3.3          5.7         2.5 virginica
+## 17          6.7         3.0          5.2         2.3 virginica
+## 18          6.5         3.0          5.8         2.2 virginica
+## 19          6.5         3.2          5.1         2.0 virginica
+## 20          6.5         3.0          5.5         1.8 virginica
+## 21          6.5         3.0          5.2         2.0 virginica
+## 22          6.4         3.2          5.3         2.3 virginica
+## 23          6.4         3.1          5.5         1.8 virginica
+## 24          6.3         3.3          6.0         2.5 virginica
+## 25          6.3         3.4          5.6         2.4 virginica
+## 26          6.2         3.4          5.4         2.3 virginica
+## 27          6.1         3.0          4.9         1.8 virginica
+## 28          6.0         3.0          4.8         1.8 virginica
+## 29          5.9         3.0          5.1         1.8 virginica</code></pre>
+<hr />
+</div>
+</div>
+</div>
+<div id="descriptive-statistics" class="section level1">
+<h1>Descriptive Statistics</h1>
+<p>“Descriptive statistics are brief descriptive coefficients that summarize a given data set, which can be either a representation of the entire population or a sample of a population. Descriptive statistics are broken down into measures of central tendency and measures of variability (spread)” - The first thing to appear on google, www.investopedia.com</p>
+<p>Basically, descriptive statistics gives us quick snapshots of our data. R has loaded in functions (and a variety of packages to use) to generate simple and fast descriptive statistics.</p>
+<div id="data-1" class="section level2">
+<h2>Data</h2>
+<p>We’re going to be using the beaver1 dataset from the datasets package. For more information, code ?beaver1 in your console or script after installing the package.</p>
+<pre class="r"><code># install.packages(&quot;datasets&quot;) # install if you never had used it before
+library(datasets)
+
+head(beaver1) # initial look</code></pre>
+<pre><code>##   day time  temp activ
+## 1 346  840 36.33     0
+## 2 346  850 36.34     0
+## 3 346  900 36.35     0
+## 4 346  910 36.42     0
+## 5 346  920 36.55     0
+## 6 346  930 36.69     0</code></pre>
+</div>
+<div id="basic-statistics-of-base-r" class="section level2">
+<h2>Basic Statistics of base R</h2>
+<p>R comes with a basic package for looking at descriptive statistics. The following functions are base functions meaning we don’t need to load any packages, its already there.</p>
+<div id="mean" class="section level3">
+<h3>mean()</h3>
+<p>Calculates mean.</p>
+<pre class="r"><code>mean(beaver1$temp)</code></pre>
+<pre><code>## [1] 36.86219</code></pre>
+</div>
+<div id="min" class="section level3">
+<h3>min()</h3>
+<p>Minimum value of dataset column or list.</p>
+<pre class="r"><code>min(beaver1$temp)</code></pre>
+<pre><code>## [1] 36.33</code></pre>
+</div>
+<div id="max" class="section level3">
+<h3>max</h3>
+<p>Maximum value of dataset column or list.</p>
+<pre class="r"><code>max(beaver1$temp)</code></pre>
+<pre><code>## [1] 37.53</code></pre>
+</div>
+<div id="range" class="section level3">
+<h3>range()</h3>
+<p>The range of values in a column or list. Code is also included for finding difference in range of numbers and working with square brackets.</p>
+<pre class="r"><code>range(beaver1$temp) # returns minimum and max</code></pre>
+<pre><code>## [1] 36.33 37.53</code></pre>
+<pre class="r"><code># If you would like to find the difference, run code below.
+range(beaver1$temp)[2] - range(beaver1$temp)[1] </code></pre>
+<pre><code>## [1] 1.2</code></pre>
+<pre class="r"><code># Notes: Range returns 2 values. If you have a list (just like the list of 2 values above), 
+# you can use square brackets [] to choose which value in the list you want to work with. 
+# So we can choose the max value [2 or the second value in list] and subtract the min value
+# [1 or the first value in list]. 
+
+# For more on square brackets: https://www.dataanalytics.org.uk/r-object-elements-brackets-double-brackets-and/</code></pre>
+</div>
+<div id="median" class="section level3">
+<h3>median()</h3>
+<p>Finds median of data column or list.</p>
+<pre class="r"><code>median(beaver1$temp)</code></pre>
+<pre><code>## [1] 36.87</code></pre>
+</div>
+<div id="quantile" class="section level3">
+<h3>quantile()</h3>
+<p>Finds the indicated quantile. Quantile amount is in percent format (50% = 0.5)</p>
+<pre class="r"><code># 30 percent quantile
+quantile(beaver1$temp, 0.3)</code></pre>
+<pre><code>##    30% 
+## 36.789</code></pre>
+<pre class="r"><code># 50 percent
+quantile(beaver1$temp, 0.5)</code></pre>
+<pre><code>##   50% 
+## 36.87</code></pre>
+<p>NOTE: You can also find the quantile of many values by including a list in the function.</p>
+<pre class="r"><code>numbers &lt;- c(.25, .5, .75, .90) # I want these quantiles calculated
+quantile(beaver1$temp, numbers) # running function with numbers variable as condition</code></pre>
+<pre><code>##     25%     50%     75%     90% 
+## 36.7600 36.8700 36.9575 37.0970</code></pre>
+</div>
+<div id="sd-and-var" class="section level3">
+<h3>sd() and var()</h3>
+<p>sd() stands for standard deviation. var() stands for the variance.</p>
+<pre class="r"><code>sd(beaver1$temp) # standard deviation</code></pre>
+<pre><code>## [1] 0.1934217</code></pre>
+<pre class="r"><code>var(beaver1$temp) # variance</code></pre>
+<pre><code>## [1] 0.03741196</code></pre>
+</div>
+<div id="summary" class="section level3">
+<h3>summary()</h3>
+<p>summary() is best the bang for your buck and shows almost (except sd and variance) everything we have covered so far in one single function. You can run it on entire datasets.</p>
+<pre class="r"><code>summary(beaver1)</code></pre>
+<pre><code>##       day             time             temp           activ        
+##  Min.   :346.0   Min.   :   0.0   Min.   :36.33   Min.   :0.00000  
+##  1st Qu.:346.0   1st Qu.: 932.5   1st Qu.:36.76   1st Qu.:0.00000  
+##  Median :346.0   Median :1415.0   Median :36.87   Median :0.00000  
+##  Mean   :346.2   Mean   :1312.0   Mean   :36.86   Mean   :0.05263  
+##  3rd Qu.:346.0   3rd Qu.:1887.5   3rd Qu.:36.96   3rd Qu.:0.00000  
+##  Max.   :347.0   Max.   :2350.0   Max.   :37.53   Max.   :1.00000</code></pre>
+</div>
+<div id="mode" class="section level3">
+<h3>mode()</h3>
+<p>mode() doesn’t exist.. I’m not sure why but there are other ways to find this value through using table() and sort.</p>
+<pre class="r"><code>sort(table(beaver1$temp), decreasing = TRUE)[1] # table() to find how many per value, sort() to sort!</code></pre>
+<pre><code>## 36.89 
+##     7</code></pre>
+<pre class="r"><code># then just select the first value (which should be our most occurring value based on a decreasing
+# sort) and use square brackets [1] to find the first value in the list.</code></pre>
+</div>
+</div>
+<div id="the-psych-package-and-describeby" class="section level2">
+<h2>The psych package and describeBy()</h2>
+<p>There are a few packages that do some great descriptive analyses but psych is awesome. Install pysch and we are going to use describeBy(). This function can give us most of the descriptive statistics we need in a few lines of code. It can save you some time!</p>
+<p>Let’s view the descriptive statistics for each column in iris and group them by species.</p>
+<pre class="r"><code># install.packages(&quot;psych&quot;) # install if needed!
+library(psych)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;psych&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
+## 
+##     %+%, alpha</code></pre>
+<pre><code>## The following objects are masked from &#39;package:terra&#39;:
+## 
+##     describe, rescale</code></pre>
+<pre class="r"><code>describeBy(iris, # define what data you will be using
+            group = iris$Species) # define how you want to group your statistics</code></pre>
+<pre><code>## 
+##  Descriptive statistics by group 
+## group: setosa
+##              vars  n mean   sd median trimmed  mad min max range skew kurtosis
+## Sepal.Length    1 50 5.01 0.35    5.0    5.00 0.30 4.3 5.8   1.5 0.11    -0.45
+## Sepal.Width     2 50 3.43 0.38    3.4    3.42 0.37 2.3 4.4   2.1 0.04     0.60
+## Petal.Length    3 50 1.46 0.17    1.5    1.46 0.15 1.0 1.9   0.9 0.10     0.65
+## Petal.Width     4 50 0.25 0.11    0.2    0.24 0.00 0.1 0.6   0.5 1.18     1.26
+## Species*        5 50 1.00 0.00    1.0    1.00 0.00 1.0 1.0   0.0  NaN      NaN
+##                se
+## Sepal.Length 0.05
+## Sepal.Width  0.05
+## Petal.Length 0.02
+## Petal.Width  0.01
+## Species*     0.00
+## ------------------------------------------------------------ 
+## group: versicolor
+##              vars  n mean   sd median trimmed  mad min max range  skew kurtosis
+## Sepal.Length    1 50 5.94 0.52   5.90    5.94 0.52 4.9 7.0   2.1  0.10    -0.69
+## Sepal.Width     2 50 2.77 0.31   2.80    2.78 0.30 2.0 3.4   1.4 -0.34    -0.55
+## Petal.Length    3 50 4.26 0.47   4.35    4.29 0.52 3.0 5.1   2.1 -0.57    -0.19
+## Petal.Width     4 50 1.33 0.20   1.30    1.32 0.22 1.0 1.8   0.8 -0.03    -0.59
+## Species*        5 50 2.00 0.00   2.00    2.00 0.00 2.0 2.0   0.0   NaN      NaN
+##                se
+## Sepal.Length 0.07
+## Sepal.Width  0.04
+## Petal.Length 0.07
+## Petal.Width  0.03
+## Species*     0.00
+## ------------------------------------------------------------ 
+## group: virginica
+##              vars  n mean   sd median trimmed  mad min max range  skew kurtosis
+## Sepal.Length    1 50 6.59 0.64   6.50    6.57 0.59 4.9 7.9   3.0  0.11    -0.20
+## Sepal.Width     2 50 2.97 0.32   3.00    2.96 0.30 2.2 3.8   1.6  0.34     0.38
+## Petal.Length    3 50 5.55 0.55   5.55    5.51 0.67 4.5 6.9   2.4  0.52    -0.37
+## Petal.Width     4 50 2.03 0.27   2.00    2.03 0.30 1.4 2.5   1.1 -0.12    -0.75
+## Species*        5 50 3.00 0.00   3.00    3.00 0.00 3.0 3.0   0.0   NaN      NaN
+##                se
+## Sepal.Length 0.09
+## Sepal.Width  0.05
+## Petal.Length 0.08
+## Petal.Width  0.04
+## Species*     0.00</code></pre>
+</div>
+<div id="basic-plots-for-descriptive-statistics" class="section level2">
+<h2>Basic Plots for Descriptive Statistics</h2>
+<p>We will spend week 3 going over data visualization and I’ll provide with several different ways to make some excellent graphs (and some maps! - that comes later too) but here are some simple ways to visualize your data.</p>
+<hr />
+<div id="hist" class="section level3">
+<h3>hist()</h3>
+<p>Histograms give us insight into the spread of our data.</p>
+<pre class="r"><code>hist(iris$Sepal.Length)</code></pre>
+<p><img src="Introduction_to_Data_Wrangling_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="boxplot" class="section level3">
+<h3>boxplot()</h3>
+<p>Boxplots are very similar to histograms but can only measure the quantitative values of a qualitative variable. For example, we can look at the distribution of sepal lengths for each iris species.</p>
+<p>Boxplot code always follows this format: boxplot(quantitative variable ~ qualitative variable) or boxplot(y axis ~ x axis).</p>
+<pre class="r"><code>boxplot(iris$Sepal.Length ~ iris$Species) # first y axis then x axis</code></pre>
+<p><img src="Introduction_to_Data_Wrangling_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="dotplot" class="section level3">
+<h3>dotplot()</h3>
+<p>Dotplots are very similar to boxplots only instead of boxes showing the spread of data, they show the actual value as a dot. Dotplots follow the same format as boxplots (y~x).</p>
+<p>You’ll find dotplot() in the package: lattice. Install lattice and run a dotplot.</p>
+<pre class="r"><code># install.packages(lattice) # install lattice if never used before!
+library(lattice)
+dotplot(iris$Petal.Length ~ iris$Species)</code></pre>
+<p><img src="Introduction_to_Data_Wrangling_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="scatterplots" class="section level3">
+<h3>scatterplots</h3>
+<p>A scatterplot requires two quantitative variables and is used in linear regression to measure the relationships among variables. Scatterplots follow the same format as the other (y~x) but we only need to use the function, plot().</p>
+<pre class="r"><code>plot(iris$Sepal.Length ~ iris$Sepal.Width)</code></pre>
+<p><img src="Introduction_to_Data_Wrangling_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+</div>
+</div>
+<div id="done" class="section level2">
+<h2>Done!</h2>
+<p>That was fairly long but I hope it helped you learn (or reinforce) some skills in getting to know your data. The week 2 assignment is in week 2 module.</p>
+<p>As always, if you need any help feel free to contact me or come to the zoom office hours.</p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

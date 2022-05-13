@@ -1,0 +1,640 @@
+---
+title: "Introduction to Spatial Vector Data Using the sf Package"
+author: "Josh Carrell - Utah State University, MS Ecology"
+date: "Last Update: `r format(Sys.time(), '%B %d, %Y')`"
+output:
+ html_document:
+    toc: true
+    toc_float:
+      toc_collapsed: true
+    toc_depth: 4
+    number_sections: False
+    theme: spacelab
+    code_folding: 'hide'
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Spatial Vector Data
+
+As you remember from the Week 4 lecture guide, spatial vector data are discrete datasets in the form of points, lines, and polygons. 
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/plpz.png)
+
+Points are locations in space defined by a set of coordinates (x,y). Lines are derived from the connection of at least 2 points (called nodes). Polygons are created through the connection of lines that encapsulate an area.
+
+---
+
+### Shapefiles
+
+The common vector data type is the shapefile (.shp). Shapefiles contains a few other data like a projection file that contains our coordinate system (.prj), tabular information describing the characteristics of the spatial data (.dbf) and a few others. 
+
+Shapefiles are not the only vector data type you can work with but as for this class, We will be working with shapefiles.
+
+---
+
+## sf
+
+Straight from the horses mouth,
+
+*"Simple features or simple feature access refers to a formal standard (ISO 19125-1:2004) that describes how objects in the real world can be represented in computers, with emphasis on the spatial geometry of these objects. It also describes how such objects can be stored in and retrieved from databases, and which geometrical operations should be defined for them".* - sf package documentation
+
+Basically, sf is a package that allows us to upload, organize, manipulate, analyze, and visualize spatial data. 
+
+- Most sf functions start with **"st_"**. 
+
+In this coding guide, we will use a case study and introduce 20 (that's right, 20!) sf functions. There are more sf funtions out there, but these 20 will get you on the right track for working with spatial vector data.
+
+---
+
+## Data
+
+Our data for this guide will focus on the 4 corners area of the United States. We will be using the following:
+
+- Points: Occurrences (either viewed locations or collected specimen) of Mule Deer.
+
+- Lines: Major Highways of the United States
+
+- Polygons: States of the United States & Counties of 4 corners states
+
+---
+
+## Objectives: 
+
+The purpose of this coding guide is to show you practical examples of using sf and it's many functions. We're covering around 20 functions here. It's more than enough to get started and to start thinking about how you want to work with spatial vector data.
+
+---
+
+### libraries 
+
+Install (if you haven't already - you should have by now!) and load the following packages:
+
+- sf
+
+- tidyverse
+
+```{r, results = F}
+library(sf)
+library(tidyverse)
+```
+
+---
+
+## sf functions
+
+
+### st_read()
+
+st_read() is the function for loading shapefiles into R. Lets load in the following shapefiles found in the Week 4 data folder on Canvas:
+
+- United States Counties (tl_2021_us_county.shp)
+
+- United States States (states.shp)
+
+- United States Major Highways (tl_2017_us_primaryroads.shp)
+
+---
+
+NOTE: You'll notice a few characteristics of the data pop up when loading in a shapefile (same thing for a raster):
+
+- Shapefile Name
+
+- Simple feature with x features and x fields (# of rows by # of columns)
+
+- Geometry type (Point, line, or polygon)
+
+- Dimension (spatial, it requires x,y coordinates)
+
+- Bounding box (the larger extent around the data)
+
+- Geodetic CRS (Which coordinate system is currently assigned to the data)
+
+---
+
+```{r, message=FALSE}
+# US counties
+counties <- st_read("D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/sf_datasets/tl_2021_us_county.shp")
+
+# US States
+states <- st_read("D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/sf_datasets/state.shp")
+
+# Roads
+roads <- st_read("D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/sf_datasets/tl_2017_us_primaryroads.shp")
+```
+
+---
+
+#### Examine
+
+Below are a few common functions that I use to examine my data. They are not from the sf packge but they are very useful. 
+
+Check out the code and the outputs below!
+
+```{r}
+str(counties) # data structure
+dim(counties) # data dimensions
+head(counties, 2) # quick view
+names(counties) # column names
+class(counties) # What is it?
+```
+
+---
+
+### st_crs()
+
+As we learned in the lecture guide, the geographic coordinate systems assigned to the data makes a big difference in how we visualize our data. There is another important aspect of geographic coordinate systems: 
+
+**For spatial data to be mapped properly in R, all data must be in the same CRS**. 
+
+R doesn't automatically reproject your data for you (ESRI ArcGIS Products do). We need to check the CRS of each data and transform them to match our desired coordinate system. 
+
+You can check the coordinate system by using the function, **st_crs()**. Warning, the full CRS name will print... it gets overwhelming to look at. Helpful things to point out are the Datum name (near the top) and the EPSG code (near the bottom).
+
+Check out the code and outputs below:
+
+```{r}
+st_crs(counties)
+st_crs(states)
+st_crs(roads)
+```
+
+---
+
+#### CRS == CRS?
+
+You can even run the function and check to see if the CRS of 2 different data are the same:
+
+```{r}
+st_crs(counties) == st_crs(states) # You must use 2 equal signs, ==
+# reponse will be T or F
+```
+---
+
+### st_transform()
+
+At this point, we have taken a look the basic details of the data including the assigned CRS. But what if we want to change the coordinate system?
+
+st_transform() allows for the data to be "transformed" (projected is also a good term) from one CRS to another. The basic syntax is as follows:
+
+**x <- st_tranform(x, EPSG Code of new CRS)**
+
+Make sure you assign the function and code to the current shapefile you want to transform. Otherwise, it won't apply to your data.
+
+---
+
+For this assignment, we are going to transform our data to: NAD83 / Conus Albers (EPSG 5070). 
+
+Lets change those CRS' of the data. Check the code below:
+
+```{r}
+counties <- st_transform(counties, 5070)
+states <- st_transform(states, 5070)
+roads <- st_transform(roads, 5070)
+
+```
+
+---
+
+### st_geometry()
+
+If the changing of our data worked, we should be able to plot our data.. Let's plot states.
+
+```{r}
+plot(states)
+```
+
+**So what happened?**
+
+Well, if you only use the plot() function, that particular shapefile will plot not only the shapefile geometry but also the geometry for every column in the dataset (except for the geometry column - which contains the spatial data - the other columns are our tabular descriptive data). 
+
+Above are 4 maps. How many columns were there? Check code below:
+
+```{r}
+ncol(states)-1 # checking the number of columns, subtracting 1 as the geometry column doesn't plot
+```
+
+**st_geometry()** makes our life easier. The function goes inside the plot() function and the dataset we want to plot goes inside. Like this:
+
+**plot(st_geometry(states))**
+
+Let's check it out:
+
+```{r}
+plot(st_geometry(states))
+```
+
+---
+
+#### The $ sign
+
+You can also use the $ to direct your shapefile to plot only the geometry column. Like this:
+
+**plot(states$geometry)**
+
+Both ways work.. It's up to you.
+
+---
+
+#### Add = T
+
+We can plot several shapefiles together in the same plot/map (IF they are in the same CRS, remember?). We simply add:
+
+**add = T**
+
+in our plot() function. 
+
+Let's plot States and Roads together. Check the code below:
+
+```{r}
+plot(states$geometry)
+plot(st_geometry(roads$geometry), add = T)
+```
+
+---
+
+### Subsetting Spatial Data Frames
+
+The functions from the tidyverse can be directly applied to our spatial data for manipulation. If you remember from our objectives above, we are interested in mapping deer occurrences in the 4 corners states: AZ, UT, CO, NM. The "STATE" column in the states.shp contains the names of each state. We will use that as our subsetting column. Let's call it states_4.
+
+Check the code for subsetting our spatial data:
+
+```{r}
+# Subset dataset to include only Four-corners states.
+corners4 <- c("Arizona", "Colorado", "New Mexico", "Utah") # state names
+
+states_4 <- states %>% # subsetting data from states
+  subset(STATE %in% corners4) # %in% searches lists; looking for names in States
+
+plot(states_4$geometry) # plot. Should be 4 corners states!
+```
+
+---
+
+### st_crop() vs. st_intersection()
+
+Subsetting our States shapefile to the 4 corners states was easy.. Mostly because the state name data was already supplied to us. What about roads and counties? Can we just subset them to the four corners states?
+
+Sadly, we can't. Those data do not have a state column. However, there are some sf functions that allow us to clip the spatial dimensions of our data to match that of the 4 corners.
+
+#### st_crop()
+
+st_crop() will crop an sf object to a specific rectangle. 
+
+Let's see what our roads data looks like when it is cropped to 4 corners. Check out the code below for the st_crop() syntax:
+
+```{r}
+roads <- st_crop(roads, states_4)
+plot(states_4$geometry)
+plot(roads$geometry, add = T)
+```
+
+So how does it look? Did it crop the way we thought it would? 
+
+st_crop() actually doesn't clip the data to the detailed geometry of the shapefile.. It clips the data to the bounding box extent of the data (imagine a box around our states that touches the N,S,E,W coordinates of the states).
+
+---
+
+#### st_intersection()
+
+st_intersection() is very similar to st_crop(), only it clips the data (the roads) to the detailed geometry of the shapefile of interest (the states).
+
+Let's check it out below:
+
+```{r}
+roads_4 <- st_intersection(roads, states_4)
+plot(states_4$geometry)
+plot(roads_4$geometry, add = T)
+```
+
+This is much more useful (and nicer looking too!). We will be using st_intersection() for not only the roads but also the county data.
+
+```{r}
+counties_4 <- st_intersection(counties, states_4)
+plot(states_4$geometry)
+plot(counties_4$geometry, add = T)
+```
+
+### Plotting Them All Together!
+
+Let's make a quick plot using the shapefile geometries and add = T. Let's give our data some color and a title. 
+
+Check the code for the plot below:
+
+```{r}
+plot(states_4$geometry, col = "Black", main = "Roads and Counties of the 4 Corners States")
+plot(counties_4$geometry, col = "Tan", add = T)
+plot(roads_4$geometry, col = "Red", add = T)
+```
+
+---
+
+### st_as_sf()
+
+Lets get to our deer occurrences. We have a dataset of marked locations of either harvested or observed mule deer occurrence. However, the dataset is in .csv format... 
+
+So how do we get it to become a shapefile? Let's first load our .csv and take a look at the data:
+
+```{r}
+### Load the deer csv using read.csv()| NOT in the sf package ###
+deer <- read.csv("D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/sf_datasets/mule_deer.csv")
+
+# Examine
+names(deer)
+head(deer, 2)
+```
+
+---
+
+So that is a lot of information from one dataset.. We don't need to know all of that or carry it around with us. We really only need to columns to make this tabular data into a spatial dataset: x and y. 
+
+In this case, x and y are represented as Latitude and Longitude. Let's subset our data by selecting the latitude and longitude columns (let's also through in basisOfRecord, or, "how the deer occurrence was collected).
+
+```{r}
+
+# Subset to basisOfRecord, decimalLatitude, decimalLongitude
+deer <- deer[c(22, 21, 2)]; names(deer)
+
+# Rename
+names(deer) <- c("X", "Y", "Record"); names(deer)
+head(deer,5)
+
+```
+
+
+---
+
+Great. We're ready to make our data spatial by adding a geometry column based off of our Latitude and Longitude columns. Since we're using latitude and longitude, let's bring the data in under a CRS that uses those units: WGS84, EPSG 4326.
+
+We'll do that by using the st_as_sf() function. This function allows you to create a spatial geometry from tabular data that has two columns for coordinates (x&y). It also requires the assignment of a CRS.
+
+The syntax looks like this:
+
+**variable <- st_as_sf(data, coords = c("X column name", "Y Column name"), crs = EPSG Code)**
+
+```{r}
+# Make into an sf object with spatial geometry using st_as_sf
+deer <- st_as_sf(deer, coords = c("X", "Y"), crs = 4326) # What happened here? Lets Check below.
+
+```
+
+Now plot it!
+
+```{r}
+# plot
+plot(deer$geometry) # How's it looking? What did we forget to change?
+```
+
+It's looking good, but it's in the wrong coordinate system. Let's convert the CRS to 5070 to match the other data layers, then let's plot them all together.
+
+
+```{r}
+# Transform
+deer_4 <- st_transform(deer, 5070)
+
+# plot
+par(mfrow=c(1,1))
+plot(states_4$geometry, main = "Deer, Roads, Counties, and the 4 Corner States")
+plot(counties_4$geometry, col = "Tan", add = T)
+plot(roads_4$geometry, col = "Red", add = T)
+plot(deer_4$geometry, col = "Blue", add = T)
+
+```
+
+A little busy looking, but we did it. We have brought in our shapefiles and occurrence data, manipulated it, and visualized it. It took about 5-6 functions to do so... But there are still so many more sf functions that are worth learning. 
+
+Now we wont cover all of them here, but below are several that are worth visiting.
+
+---
+
+### st_buffer()
+
+A buffer is exactly what it sounds like. st_buffer() creates a buffer around a point, line, or polygon at a designated distance. The syntax for st_buffer() is as follows:
+
+**buffer <- st_buffer(data, dist = x)**
+
+*Dist = x; the unit of distance is directly related to the CRS unit of measurement (degrees, meters, etc.). CRS 5070 is in meters.
+
+Let's do some examples and make 100,000 meter buffers around our points, lines, and polygons.
+
+Check out the code:
+
+
+```{r}
+pts <- st_buffer(deer_4, 100000)
+lines <- st_buffer(roads_4, 100000)
+polygonz <- st_buffer(states_4, 100000)
+
+par(mfrow=c(1,3))
+
+plot(pts$geometry, col = "Blue")
+plot(deer_4$geometry, add = T, col = "red")
+plot(lines$geometry, col = "Blue", main = "Buffers in Blue | Data in Red")
+plot(roads_4$geometry, add = T, col = "red")
+plot(polygonz$geometry, col = "Blue")
+plot(states_4$geometry, add = T, col = "red")
+```
+
+---
+
+### st_union()
+
+st_union() merges all overlapping points, lines, or polygons from a dataset. For example, let's look at our buffered points data from the previous function.
+
+```{r}
+pts <- st_buffer(deer_4, 100000)
+
+plot(pts$geometry, main = "Buffered Deer Occurrence Points: 100,000 Meters")
+```
+
+That's a lot of buffered points and looks like a scene from the Ring. It's pretty messy and not very useful at the moment. Let's say we want the general outlining shape of the buffered points, but we want it as 1 polygon. 
+
+That is where st_union() comes in. Let's run st_union() on our buffered points and plot the occurrences inside the unionized buffers:
+
+```{r}
+buffered_union <- st_union(pts$geometry)
+
+plot(buffered_union)
+plot(deer_4$geometry, add = T)
+```
+
+---
+
+### st_convex_hull()
+
+Simply put, a convex hull polygon is a polygon that encapsulates points into a polygon by defining the polygon edges from the outer most points. It's like the unionized buffer above, without the distance from the points created by the buffer.
+
+Convex hull polygons are popular in wildlife studies using occurrence data to create an polygon of the area of points. 
+
+Lets run through an example:
+
+```{r}
+CHP <- st_convex_hull(st_union(deer_4)) # requires the use of st_union() on occurrences
+
+par(mfrow=c(1,2))
+plot(CHP, main = "Convex Hull Polygon")
+plot(CHP, main = "With Deer Occurrences")
+plot(deer_4$geometry, add = T)
+```
+
+---
+
+So how do st_union() and st_convex_hull() differ? These plots below explain it all:
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(buffered_union, main = "Buffered Union")
+plot(deer_4$geometry, add = T)
+
+plot(CHP, main = "Convex Hull Polygon")
+plot(deer_4$geometry, add = T)
+```
+
+---
+
+### st_bbox() and st_as_sfc()
+
+There is another option if you would like to create a bounding box around your data. Simply run the function st_bbox() for a perfect rectangle or square bounding box around your points, lines, or polygons. 
+
+Check it out:
+
+```{r}
+# Bounding box to polygon
+bbox <- st_bbox(deer_4)
+bbox # Coordinates of spatial extent of deer points
+class(bbox)
+bbox <- st_as_sfc(bbox) # make a spatial polygon
+plot(bbox) # plot it 
+plot(deer_4$geometry, add = T)
+```
+
+---
+
+### st_area()
+
+st_area() only works on vector data that has an area, so only polygons. However, when you run st_area() it will compute the area for each polygon in the order of the dataframe. Basically, the values come out a little messy looking. Let's run it on our 4 corners states.
+
+```{r}
+areaa <- st_area(states_4); head(states_4$STATE) # see order of names
+areaa # area
+```
+
+Let's make that area output useful and put it into a new column on our states polygon:
+
+```{r}
+states_4$area <- st_area(states_4) 
+head(states_4, 5)
+```
+
+---
+
+### st_make_grid()
+
+Grids are useful for a number of analyses in spatial analysis (Zonal statistics, fishnet grids of probability modeling, etc.). st_make_grid() isn't exactly the most clever name out there but there's no second guessing what the function does. It makes grids (pretty much a raster dataset).
+
+Lets make a grid over our states polygon with cells that are 1000 square km. The cellsize will be created with the same units from the data CRS (using 5070, that's meters).
+
+```{r}
+gridz <- st_make_grid(states_4, cellsize = 100000)
+plot(states_4$geometry, col = "Blue", main = "Grid")
+plot(gridz, add = T)
+```
+
+---
+
+
+### st_coordinates()
+
+Sometimes when working with a shapefile, we only need the coordinates of that shapefile. For example, lets say we do not need the geometry column on our deer occurrences anymore, we just need the columns. We could subset the columns (an easy way), or we can run st_coordinates() (another easy way
+). 
+
+Let's run it on our deer occurrences:
+
+```{r}
+deer_coords <- st_coordinates(deer_4) %>% as.data.frame() # otherwise it is a matrix array
+head(deer_coords)
+```
+
+---
+
+
+### st_drop_geometry()
+
+A similar idea as the function above, st_drop_geometry() allows you to drop the geometry column from any spatial dataset. Lets see what the roads data looks like before and after dropping geometry:
+
+```{r}
+head(roads_4, 5) # Before
+head(st_drop_geometry(roads_4), 5) # After
+```
+
+---
+
+### st_intersects()
+
+st_intersects() is a method for returning the count of spatial data within the area of another. A good example here would be, "How many points are there in each polygon?". 
+
+Let's write the code for counting the number of each deer occurrence in each county. Then let's add it to our counties dataset as a new column.
+
+Check out the code:
+
+```{r}
+# Points in Polygons with st_intersection
+count_data <- counties_4 %>%                         # Variable count_data subsetting from counties
+  mutate(counts = lengths(st_intersects(., deer_4)))   # create new column names "counts". Lengths (the amount)
+names(count_data)                                    # intersected (within the polygon) from the deer dataset
+
+
+# What does it look like
+head(count_data); names(count_data)
+```
+
+
+## geom_sf()
+
+geom_sf() is a function that is tied to the ggplot2 package, not sf. Until this point, we have been using the plot() function. While useful, it doesn't have the capabilities that ggplot2 does. 
+
+This is just a sneak peak. We will cover cartography and spatial data visualization in week 7.
+
+Lets make a map of the counties polygons but have the colors correlate with the counts of deer occurrence per county:
+
+```{r}
+ggplot() +
+  geom_sf(data = count_data, aes(fill = counts)) +
+  labs(title = "ggplot2 can work with spatial data!")
+```
+
+
+## Bonus: par(mfrow=c(,))
+
+If you do not know of this code yet, here is an option to have several graphs in one single plot. 
+
+**par(mfrow=c(x,y))**
+
+x refers to how many rows.
+
+y refers to how many columns.
+
+Let's say I want to have a single plot with 3 rows of graphs. In each row, I want 2 graphs. I would set up my code as such:
+
+**par(mfrow=c(3,2))**
+
+Then, after running that code, you would code your graphs. The graphs would occupy the plot from top 2 bottom, left 2 right.
+
+Here is an example:
+
+```{r}
+par(mfrow=c(3,2))
+plot(states_4$geometry, col = "red", main = "Plot 1")
+plot(states_4$geometry, col = "Blue", main = "Plot 2")
+plot(states_4$geometry, col = "Green", main = "Plot 3")
+plot(states_4$geometry, col = "Yellow", main = "Plot 4")
+plot(states_4$geometry, col = "Purple", main = "Plot 5")
+plot(states_4$geometry, col = "Tan", main = "Plot 6")
+```
+
+
+## End
+

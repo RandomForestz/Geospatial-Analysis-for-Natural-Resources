@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Josh Carrell - Utah State University, MS Ecology" />
+
+
+<title>Introduction to Geospatial Science and Using Geospatial Data in R</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">NR 6950: Geospatial Analysis for Natural Resources</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    R Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_R_Programming.html">Intro to R</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Wrangling.html">Intro to Data Wrangling</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Visualization.html">Intro to Data Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Geospatial Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_Geospatial_Data_Coordinate_Systems.html">Introduction to Coordinate Systems</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Vector_Data.html">Introduction to Spatial Vector Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Raster_Data.html">Introduction to Spatial Raster Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Remote_Sensing.html">Introduction to Remote Sensing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Advanced Geospatial Topics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Point_Pattern_Analysis.html">Point Pattern Analysis</a>
+    </li>
+    <li>
+      <a href="Burn_ratio.html">Remote Sensing: Difference Normalized Burn Ratio</a>
+    </li>
+    <li>
+      <a href="Species_Distribution_Modeling.html">Species Distribution Modeling</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Introduction to Geospatial Science and Using Geospatial Data in R</h1>
+<h4 class="author">Josh Carrell - Utah State University, MS Ecology</h4>
+<h4 class="date">Last Update: May 13, 2022</h4>
+
+</div>
+
+
+<p>D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images <img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/earth.png" alt="If you google geospatial science, it can get pretty dramatic… but if you haven’t found out yet, it can be just as awesome." /></p>
+<div id="geospatial-science-and-analysis" class="section level2">
+<h2>Geospatial Science and Analysis</h2>
+<p>The primary focus of this course is expanding our ability to obtain, organize, manipulate, analyze, and visualize spatial data. Spatial data is any data or information that is associated with a geographic location. As we start to dive into geospatial analysis, let’s revisit (or get to know for the first time!) some important terms.</p>
+<hr />
+<div id="gis" class="section level3">
+<h3>GIS</h3>
+<p>GIS stands for <strong>Geographic Information System</strong>. A GIS can be any number of tools or software that allow you to obtain, organize, manipulate, analyze, and visualize spatial data rather than a single software.</p>
+<p><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/GIS.jpg" /></p>
+<hr />
+<div id="gis-software" class="section level4">
+<h4>GIS Software</h4>
+<p>You may be familiar with the Environmental Systems Research Institute (ESRI) and their products like ArcMap or ArcGIS Pro. ESRI produces excellent mapping products that are by far the most used and bought software among industry and academia, and they cost $$$$. However, ESRI simply was a front runner in developing software for geospatial analysis, but that certainly doesn’t mean they are the owners/creators of GIS.</p>
+<p>We are using R as our geographic information system. It’s a free tool/language that allows us to customize code to analyze a variety of data. By learning to program, we will get to know the structure of our data on a more intimate level. It is also a very common language in natural resources and ecology. You can also use Python, QGIS, GRASS GIS, ENVI, Imagine, or any other number of systems.</p>
+<p>It’s just important to know that GIS isn’t synonymus with any one software, it’s an idea.</p>
+<p><strong>It is also important to note that sometimes GIS is referred to geographic information science</strong>.</p>
+<hr />
+</div>
+</div>
+<div id="geography" class="section level3">
+<h3>Geography</h3>
+<p>Geography isn’t just memorizing your state capitals. Geography is the study of the natural features of the earth’s surface, including topography, climate, soil, vegetation, etc, and man’s response to them.</p>
+<p>Essentially, this class is an applied geography course. We are just using a programming language and pre-built software to analyze relationships among Earth’s features and the constructs of human perception.</p>
+<div class="figure">
+<img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/geography%20is%20lame.jpg" alt="" />
+<p class="caption">Why do we always associate geography with super lame clip art and boring middle school classes… No more!</p>
+</div>
+<hr />
+</div>
+<div id="remote-sensing" class="section level3">
+<h3>Remote Sensing</h3>
+<p>From the USGS, “Remote sensing is the process of detecting and monitoring the physical characteristics of an area by measuring its reflected and emitted radiation at a distance (typically from satellite or aircraft). Special cameras collect remotely sensed images, which help researchers”sense” things about the Earth”.</p>
+<p>We will get into remote sensing in the upcoming weeks. Right now, it’s good to know it is simply a method used to obtain information about the earth and it’s surface (geological features, biological features, social features) through the use of imagery (very simply put).</p>
+<div class="figure">
+<img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/What-is-Remote-Sensing-1.jpg" alt="" />
+<p class="caption">Looking for some inspiration? Check out this gallery of excellent remotely sensed images from NASA’s Landsat satellites: <a href="https://landsat.visibleearth.nasa.gov/" class="uri">https://landsat.visibleearth.nasa.gov/</a></p>
+</div>
+<hr />
+</div>
+</div>
+<div id="geospatial-data-types" class="section level2">
+<h2>Geospatial Data Types</h2>
+<p>As mentioned above, geospatial data is any data that is tied to a geographic location. The spatial information (expressed in the form of coordinates) is often combined with tabular data. Tabular data often described what is going on at those coordinates and gives identity to the spatial data.</p>
+<div class="figure">
+<img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/tabular.jpg" alt="" />
+<p class="caption">Above is an example of tabular data with geospatial information (Latitude and Longitude) of earthquake epicenters</p>
+</div>
+<hr />
+<p>There are a two types of geospatial data we will be working with this semester. <strong>Vector and Raster</strong>.</p>
+<div id="vector" class="section level3">
+<h3>Vector</h3>
+<p>Vector datasets are often described as points, lines, and polygons. They are the most common data types you will work with in geospatial analysis.</p>
+<div class="figure">
+<img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/plp.png" alt="" />
+<p class="caption">Points, lines, and polygons are all around us!</p>
+</div>
+<hr />
+<div id="points" class="section level4">
+<h4>Points</h4>
+<p>Points are the most basic spatial data type you will ever work with. They consist of a set of coordinates (x,y) and have no length or width. They are simply just a location in space. There is no possibility of points overlapping which is possible with lines and polygons.</p>
+<p>Points can be used to represent a variety of objects at varying spatial scales (scale covered below).</p>
+<p>Some examples of what a point could represent:</p>
+<ul>
+<li><p>Fire Hydrants</p></li>
+<li><p>Species Occurrence Location</p></li>
+<li><p>Oil and Gas Well</p></li>
+<li><p>Cities</p></li>
+<li><p>Lightning Strike Location</p></li>
+<li><p>Campgrounds</p></li>
+</ul>
+<hr />
+</div>
+<div id="lines" class="section level4">
+<h4>Lines</h4>
+<p>Lines are the result of at least 2 connected points. The spatial location and dimension of a line is defined by the geographic location of those 2 points and the distance between them, which results in lines only having 1 dimension, length. Lines cannot have a width.</p>
+<p>Lines are very common in spatial datasets and often represent the following:</p>
+<ul>
+<li><p>Roads</p></li>
+<li><p>Utility lines (i.e, sewage, power, etc.)</p></li>
+<li><p>Rivers</p></li>
+<li><p>Trails</p></li>
+<li><p>Fault lines</p></li>
+</ul>
+<hr />
+</div>
+<div id="polygons" class="section level4">
+<h4>Polygons</h4>
+<p>Polygons are spatial objects that have both length and width, resulting in an area. It is through the connection of lines (which come from points… It’s all connected!).</p>
+<p>Polygons may represent:</p>
+<ul>
+<li><p>Lakes</p></li>
+<li><p>Political Boundaries (i.e, Countries, States, Districts, National Parks, etc.)</p></li>
+<li><p>Habitat Designations</p></li>
+<li><p>Anything with an area!</p></li>
+</ul>
+<hr />
+<p><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/plps.png" /></p>
+<hr />
+</div>
+</div>
+<div id="raster" class="section level3">
+<h3>Raster</h3>
+<p>Raster data consists of a matrix of cells/pixels that are organized into columns and rows. The cell area size (length x width) will be consistent across all cells for that particular dataset.</p>
+<p>Common raster data are Digital Elevation Models (DEM), Satellite Imagery, Probability Models.</p>
+<p>The values that populate the cells of a raster data often describe what type of raster you are working with. The 2 types of raster data we work with are continuous and discrete.</p>
+<p><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/raster.png" /></p>
+<hr />
+<div id="continuous" class="section level4">
+<h4>Continuous</h4>
+<p>Continuous raster data has cell values that are quantitative/numerical. These values may be the values of elevation in meters, degrees of slope, or the reflectance values of the electromagnetic spectrum (Remote sensing. we will cover this in depth during week 6 and beyond).</p>
+<p><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/dem.png" /></p>
+<hr />
+</div>
+<div id="discrete" class="section level4">
+<h4>Discrete</h4>
+<p>Discrete raster data has cell values that are categorical or thematic. In lieu of numerical values, cell values are populated with descriptive values. For example, landcover rasters contain information about what cover type occupies that cell. Instead of numbers, the cell contains types (i.e, water, agriculture, urban, forest, etc.)</p>
+<p><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/land.jpg" /></p>
+<hr />
+</div>
+</div>
+</div>
+<div id="spatial-scale" class="section level2">
+<h2>Spatial Scale</h2>
+<p>“Spatial scale has traditionally been defined by cartographers as the ratio between a distance on a map to the same distance in reality” - Atkinson 2005</p>
+<p>Scale is often be numerically defined by x:xxx. For example, if something on your map is 1000th the size of the real life object, your spatial scale is 1:10,000.</p>
+<p>Your project will often define at which scale you are mapping. For example, if you are mapping the distribution of the Red Fox, you’ll be working at a very large scale (the Red Fox is distributed across the entire Northern Hemisphere). On the flip side, If you are mapping the flowering dandelions in your yard, your scale will be very small.</p>
+<p>Check out this graph that gives spatial scaling identity to nautral phenomen.</p>
+<p><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/scale.jpg" /></p>
+<hr />
+</div>
+<div id="coordinate-systems" class="section level2">
+<h2>Coordinate Systems</h2>
+<p>A geographic coordinate system (GCS) uses a three-dimensional spherical surface to define locations. - ESRI</p>
+<p>“A coordinate system is a system that uses numbers or coordinates to determine the position of a point or geometric element within a geographic framework”. - (Wikipedia - that’s right!)</p>
+<p>To expand that sentence, the Earth isn’t the exact globe shaped circle we envision it to be. It is an ellipsoid (think of the shape of a cutie mandarin orange.. its almost a sphere, just a little smashed down). <img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/ellipsoid.jpg" /></p>
+<p>Basically, coordinate systems are geographic frameworks (or models) that project the Earths surface differently. This means different coordinate system project the surface of the Earth differently and even use different units of measurement (Latitude/Longitude, Meters, UTMs).</p>
+<p>There are a few components of a GCS:</p>
+<ul>
+<li><p><strong>Angular unit of measure</strong></p></li>
+<li><p><strong>Prime Meridian</strong></p></li>
+<li><p><strong>Datum (Based on a spheroid)</strong></p></li>
+</ul>
+<p>The truth is, you don’t need to know everything about coordinate systems. You really just need to know that each GCS projects your data a little differently, each produce some sort of bias or distoration, and how to change spatial data from one coordinate system to the other. You should add in that you should know what the general characteristics of your current GCS are.</p>
+<hr />
+<div id="epsg-codes" class="section level3">
+<h3>EPSG codes</h3>
+<p>Do you know how many different CRS’ and projections there are? <strong>Thousands</strong>.</p>
+<p>I couldn’t find the exact figure but as a reference, ESRI ArcGIS products have over 4000 imbedded in their software. That’s a lot.</p>
+<p>What gets crazier is how long the names of each CRS are. Here is an example of the full name (also called well-known text or wkt) for World Geodetic System 1984 (a very very common Datum):</p>
+<p>GEOGCS[“WGS 84”, DATUM[“WGS_1984”, SPHEROID[“WGS 84”,6378137,298.257223563, AUTHORITY[“EPSG”,“7030”]], AUTHORITY[“EPSG”,“6326”]], PRIMEM[“Greenwich”,0, AUTHORITY[“EPSG”,“8901”]], UNIT[“degree”,0.0174532925199433, AUTHORITY[“EPSG”,“9122”]], AUTHORITY[“EPSG”,“4326”]]</p>
+<p>Nasty stuff.</p>
+<p>Luckily, there are codes (4-5 numbers long) that are assigned to each CRS so we don’t need to worry about those long names. These codes are called <strong>EPSG codes</strong>. You can that information on these websites: <a href="https://spatialreference.org/ref/epsg/" class="uri">https://spatialreference.org/ref/epsg/</a> or <a href="https://epsg.io/" class="uri">https://epsg.io/</a></p>
+<hr />
+<p>Let’s become introduced to a few different systems and what those CRS’ look like spatially. Our example will be North America.</p>
+<pre class="r"><code>library(sf)</code></pre>
+<p><img src="Introduction_to_Geospatial_Data_Coordinate_Systems_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="Introduction_to_Geospatial_Data_Coordinate_Systems_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="Introduction_to_Geospatial_Data_Coordinate_Systems_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="Introduction_to_Geospatial_Data_Coordinate_Systems_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<hr />
+</div>
+</div>
+<div id="geospatial-data-in-r" class="section level2">
+<h2>Geospatial Data in R</h2>
+<p>There are a few packages in R that a staples for geospatial analysis: sp, sf, raster, and terra.</p>
+<p>In this class, we will use all 4 packages at some point but will place special emphasis on using sf and terra. Below is a quick description as well as the basic code for importing either a vector or raster data into R.</p>
+<hr />
+<div id="sp" class="section level3">
+<h3>sp</h3>
+<p>sp stands for spatial polygons. This package has been around for a long time in the use of importing, manipulating, and exporting spatial data in R. This package focuses on vector data analysis for points, lines, and polygons. This package, although still functioning, has been replaced by the sf package.</p>
+<hr />
+</div>
+<div id="sf" class="section level3">
+<h3>sf</h3>
+<p>sf stands for simple features. This will be our primary package used for importing, manipulating, visualizing, and exporting spatial data. The code for loading a shapefile in this package is as follows:</p>
+<p><strong>library(sf)</strong></p>
+<p><strong>variable &lt;- st_read(“file pathway/shapefile.shp”)</strong></p>
+<hr />
+</div>
+<div id="raster-1" class="section level3">
+<h3>raster</h3>
+<p>raster has long been used for working with raster data and imagery in R. While still in use, terra has been developed to replace this package (sound familiar?). The code for loading Raster in this package is as follows:</p>
+<p><strong>library(raster)</strong></p>
+<p><strong>variable &lt;- raster(“file pathway/raster.tif”)</strong></p>
+<hr />
+</div>
+<div id="terra" class="section level3">
+<h3>terra</h3>
+<p>terra is becoming a one-stop-shop for using spatial data in R. Using the terra package, we can work with both vector and raster data (though we will primarily use sf for vector data here). terra likes to have data called by different names than the other packages listed above. When working with vector or raster data, it refers to the data as “SpatVector” or “SpatRaster”. “Spat” meaning spatial. The code for loading SpatRaster in this package is as follows:</p>
+<p><strong>library(terra)</strong></p>
+<p><strong>variable &lt;- rast(“file pathway/raster.tif”)</strong></p>
+<hr />
+</div>
+</div>
+<div id="finding-geospatial-data" class="section level2">
+<h2>Finding Geospatial Data</h2>
+<p>Finding geospatial data is actually pretty easy. There are so many websites and online databases that allow free data downloads. Finding the <strong>right</strong> data you need can be fairly tricky depending on your project. Here are some tips:</p>
+<ul>
+<li><p>Start with keyword searches on the web (try to avoid downloading from any websites that look “sketchy”. Use your own judgement on that..).</p></li>
+<li><p>Search websites that are known for housing a variety of geospatial data. A few well known websites:</p></li>
+</ul>
+<ol style="list-style-type: decimal">
+<li><p>mapcruzin</p></li>
+<li><p>the national map (USGS)</p></li>
+<li><p>ESRI Open data hub</p></li>
+<li><p>Natural Earth Data</p></li>
+<li><p>USGS Earth Explorer</p></li>
+<li><p>Open Street Map</p></li>
+<li><p>Open Topography</p></li>
+</ol>
+<ul>
+<li>Check state or federal agency GIS websites ending in .gov. These agencies often have their own GIS department website with downloads.</li>
+</ul>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,251 @@
+---
+title: "Introduction to Remote Sensing"
+author: "Josh Carrell - Utah State University, MS Ecology"
+date: "Last Update: `r format(Sys.time(), '%B %d, %Y')`"
+output:
+ html_document:
+    toc: true
+    toc_float:
+      toc_collapsed: true
+    toc_depth: 4
+    number_sections: False
+    theme: spacelab
+    code_folding: 'hide'
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Remote Sensing
+
+"Remote sensing is the process of detecting and monitoring the physical characteristics of an area by measuring its reflected and emitted radiation at a distance (typically from satellite or aircraft)" - USGS
+
+At it's simplest form, remote sensing is the process of obtaining information about an object without actually coming into contact with that object. It is gathering information at a distance. If you think about it, your eyes remotely sense the world around you.
+
+However, in this sense of Remote Sensing, we are talking about the practice of cameras/sensors attached to satellite and airplanes capturing images and obtaining information about the physical, chemical, and biological properties of Earth.
+
+### Remote Sensing in Practice
+
+Remote Sensing is used in a variety studies and applications. Here is a website that outlines 100 examples of remote sensing:
+
+https://gisgeography.com/remote-sensing-applications/
+
+
+---
+
+### Electromagnetic Spectrum
+
+Light is the ingredient that allows us to examine the world around us. Everything we see, particularly color, is a result of light. 
+
+"The electromagnetic spectrum is the term used by scientists to describe the entire range of light that exists. From radio waves to gamma rays, most of the light in the universe is, in fact, invisible to us! Light is a wave of alternating electric and magnetic fields" (earthsky.org). 
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/spectrum.png)
+
+
+---
+
+Everything that comes in contact with light absorbs and reflects certain ranges of light. Why are plants green? Chlorophyll... But it's actually deeper than that. Chlorophyll absorbs visible light in the blue and red regions of the spectrum while it reflects light in the green, yellow, and near-infrared (not visible) regions. Specifically, we measure the electromagnetic in nanometers (nm) with visible in the 700-400nm.
+
+
+### The Takeaway
+
+We will be covering less of what remote sensing is, and more so how to use remote sensing techniques. If you can take away the following principles, you'll be well prepared to interpret remote sensing methods and imagery well enough at a basic level (You can spend an entire semester in a remote sensing course and only cover the basics):
+
+1. Everything we see reflects and absorbs light. 
+
+2. The human eye can only see 700nm-400nm of the electromagnetic spectrum.
+
+3. Light reflectance, absorbtion, and emittence goes far beyond the visible spectrum.
+
+4. We use the process of remote sensing to obtain information about the electromagnetic radiation (light) that is absorbed, reflected, and emitted by objects through images captured by cameras.
+
+5. Cameras (depending on price and components) can collect a single image spatially, but capture various images spectrally. These collected images of various spectra, are called bands.
+
+---
+
+## Bands 
+
+We often hear the phrase, "across time and space", when learning about geospatial analysis. When you think about remote sensing, I want you to start thinking, "across space and spectral properties". 
+
+Cameras (you'll read about specific sensors below) have the capability to capture different waves of electromagnetic radiation in the same spatial extent. These captured waves are called, "Bands". 
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/bands.png)
+
+It is through these captured bands that we understand the spectral properties (the properties that object interacts with electromagnetic radiation) of an object in space.
+
+---
+
+### Band Combinations
+
+Combining bands of imagery in mathematical operations gives us insight into examining different landscapes. 
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/combos.png)
+
+
+---
+
+
+## Sensor Types {.tabset}
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/spectral.jpg)
+
+### Multispectral
+
+Multispectral imagery captures typically 3-15 spectral bands in space. 
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/multi.png)
+
+### Hyperspectral
+
+Hyperspectral imaging captures in the hundreds to thousands of bands.
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/hyper.png)
+
+---
+
+## Resolutions {.tabset}
+
+Resolution can be defined in many different ways. Here, think of resolution as the degree of detail in a process or attribute. Remote sensing is centered around 4 distinct resolutions: Spatial, Spectral, Temporal, Radiometric.
+
+### Spatial
+
+Spatial Resolution refers to pixel size. The smaller the pixel size, the greater the definition of the image. For example, Landsat satellites capture data in 30m resolution. Each pixel is 90x90 feet in area. That's pretty big. My entire house and yard could fit in a single pixel. Looking at Landsat data, I could not be able to find my house. 
+
+Some imagery has fine spatial resolution at 1m. I could easily pick out my home in a 1m pixel image. 
+
+Spatial resolution is a primary driver in deciding what imagery to use for what analysis. A 30m spatial resolution image would be worthless if we are remotely sensing ant hills. A 1m spatial resolution would be terribly difficult to process if examining global processes. 
+
+### Spectral
+
+"Spectral resolution describes the ability of a sensor to define fine wavelength intervals. The finer the spectral resolution, the narrower the wavelength range for a particular channel or band". 
+
+The higher the spectral resolution, the more analyses you can process.
+
+
+### Temporal
+
+Temporal resolution refers to the return-interval among satellites. Landsat satellites revolve the earth in 16 days. That means every 16 days the satellite passes over the same geographic location on Earth. 
+
+Some imagery, like aerial imagery doesn't have a temporal resolution. It is simply collected when it is collected. 
+
+Some satellites are fixed, meaning they are fixed over a specific location on Earth and rotate with the Earth, focusing on the same location constantly. These satellite have no temporal resolution.
+
+### Radiometric
+
+"The radiometric resolution of image data in remote sensing stands for the ability of the sensor to distinguish different grey-scale values. It is measured in bit. The more bit an image has, the more grey-scale values can be stored, and, thus, more differences in the reflection on the land surfaces can be spotted."
+
+---
+
+## Sensors & Imagery {.tabset}
+
+### NAIP
+
+The National Agriculture Imagery Program (NAIP) acquires aerial imagery during the agricultural growing seasons in the continental U.S. A primary goal of the NAIP program is to make digital ortho photography available to governmental agencies and the public within a year of acquisition.
+
+NAIP imagery is acquired from aircraft using film or digital cameras that meet rigid calibration specifications.
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/naip.jpg)
+
+### Landsat
+
+The NASA/USGS Landsat Program provides the longest continuous space-based record of Earth’s land in existence. Landsat data give us information essential for making informed decisions about Earth’s resources and environment.
+
+Spatial Resolution: 30m
+
+Multi-Spectral
+
+Temporal Resolution: 16 Days
+
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/landsat.jpg)
+
+
+### SENTINEL-2
+
+"SENTINEL-2 is a European wide-swath, high-resolution, multi-spectral imaging mission. The full mission specification of the twin satellites flying in the same orbit but phased at 180°, is designed to give a high revisit frequency of 5 days at the Equator.
+
+SENTINEL-2 carries an optical instrument payload that samples 13 spectral bands: four bands at 10 m, six bands at 20 m and three bands at 60 m spatial resolution. The orbital swath width is 290 km."
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/Sentinel-2.jpg)
+
+### MODIS
+
+"MODIS (or Moderate Resolution Imaging Spectroradiometer) is a key instrument aboard the Terra (originally known as EOS AM-1) and Aqua (originally known as EOS PM-1) satellites. Terra's orbit around the Earth is timed so that it passes from north to south across the equator in the morning, while Aqua passes south to north over the equator in the afternoon. Terra MODIS and Aqua MODIS are viewing the entire Earth's surface every 1 to 2 days, acquiring data in 36 spectral bands, or groups of wavelengths (see MODIS Technical Specifications)."
+
+1km Spatial Resolution.
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/MODIS.jpg)
+
+
+## Basic Remote Sensing (raster) Functions
+
+### rast()
+
+As we learned in week 5, rast() loads raster data.
+
+---
+
+### project()
+
+Project is the same function we used in week 5 and mimics st_transform() for raster data by projecting a raster to a different CRS.
+
+**raster <- terra::project(raster, new projection)**
+
+---
+
+### c()
+
+c() is for concatenate. We used this last week for stacking raster data.
+
+---
+
+### PlotRGB()
+
+Images you have seen from satellite imagery require a band combination of 3 bands. PlotRGB() stands for plot red, green, blue. Basically, the output image is a combination of the spectral properties of each band and where they are assigned in the image (either red, green, or blue locations).
+
+---
+
+## Vegetation Indices
+
+Vegetation indices are mathematical operations using spectral imagery bands that analyze imagery. 
+
+---
+
+### Normalized Difference Vegetation Index (NDVI)
+
+"The NDVI is a dimensionless index that describes the difference between visible and near-infrared reflectance of vegetation cover and can be used to estimate the density of green on an area of land" (Weier and Herring, 2000).
+
+NDVI is a very common remote sensing vegetation indices. In simple form, it measures "greeness" of vegetation. This could be used to measure plant phenology, analyze unhealthy vegetation, or be used to classify imagery.
+
+NDVI is calculated by the following band formula:
+
+**(Near-Infrared - Red)/(Near-Infrared + Red)**
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/ndvi.jpg)
+
+---
+
+## Unsupervised Classification
+
+"The goal of unsupervised classification is to automatically segregate pixels of a remote sensing image into groups of similar spectral character. 
+
+Classification is done using one of several statistical routines generally called “clustering” where classes of pixels are created based on their shared spectral signatures." - David Harbor
+
+---
+
+### K-means clustering
+
+k-means clustering is a method of vector quantization, originally from signal processing, that aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster.
+
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/classification.png)
+---
+
+## Gathering Remote Sensing Imagery
+
+USGS Earth Explorer - https://earthexplorer.usgs.gov/
+
+
+

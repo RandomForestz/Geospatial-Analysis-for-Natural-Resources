@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Josh Carrell - Utah State University, MS Ecology" />
+
+
+<title>Point Pattern Analysis: Coding Guide</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">NR 6950: Geospatial Analysis for Natural Resources</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    R Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_R_Programming.html">Intro to R</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Wrangling.html">Intro to Data Wrangling</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Data_Visualization.html">Intro to Data Visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Geospatial Basics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Introduction_to_Geospatial_Data_Coordinate_Systems.html">Introduction to Coordinate Systems</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Vector_Data.html">Introduction to Spatial Vector Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Spatial_Raster_Data.html">Introduction to Spatial Raster Data</a>
+    </li>
+    <li>
+      <a href="Introduction_to_Remote_Sensing.html">Introduction to Remote Sensing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Advanced Geospatial Topics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Point_Pattern_Analysis.html">Point Pattern Analysis</a>
+    </li>
+    <li>
+      <a href="Burn_ratio.html">Remote Sensing: Difference Normalized Burn Ratio</a>
+    </li>
+    <li>
+      <a href="Species_Distribution_Modeling.html">Species Distribution Modeling</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Point Pattern Analysis: Coding Guide</h1>
+<h4 class="author">Josh Carrell - Utah State University, MS Ecology</h4>
+<h4 class="date">Last Update: May 13, 2022</h4>
+
+</div>
+
+
+<div id="point-pattern-analysis-ppa---definition" class="section level2">
+<h2>Point-Pattern Analysis (PPA) - Definition</h2>
+<p>Point-Pattern Analysis is the is the examination of the spatial arrangements of points in (usually 2-dimensional) space. While, PPA allows us to examine patterns, it is what the points represent that allows us to better understand the world around us.</p>
+<p>PPA is a big topic in spatial statistics. So for time’s sake (We have much to cover yet!), we won’t be covering anything too crazy. We will be learning how to set up a point pattern analysis study with our data, visualize point density, and use a simple function to estimate relationships and randomness.</p>
+</div>
+<div id="kernal-density" class="section level2">
+<h2>Kernal Density</h2>
+<p>Kernel density is a non-parametric way to estimate the probability density function of a random variable.</p>
+</div>
+<div id="spatstat" class="section level2">
+<h2>SpatStat</h2>
+<p>Spatstat is a family of packages for the statistical analysis of spatial point patterns. Load the Spatstat package.</p>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>For this analysis, we are going to be analyzing point patterns for various causes of fires in Tonto National Forest located in central Arizona.</p>
+<p>In your week 9 data folder, you should find two shapefiles:</p>
+<ul>
+<li><p>fire_tonto.shp (Fire occurrence starting points)</p></li>
+<li><p>Tonto_NF.shp (Tonto National Forest Boundary)</p></li>
+</ul>
+<p><img src="D:/R%20Textbook%20Template/NR6950%20Notebook/NR%206950%20Notebook/images/tonto.jpg" /></p>
+<pre class="r"><code>fire &lt;- terra::vect(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/Point_pattern/fire_tonto.shp&quot;)
+tonto &lt;- terra::vect(&quot;D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/Point_pattern/Tonto_NF.shp&quot;)
+
+fire &lt;- terra::project(fire, prj.aeaN83)
+tonto &lt;- terra::project(tonto, prj.aeaN83)</code></pre>
+<pre class="r"><code>head(fire,5)</code></pre>
+<pre><code>##   FIRE_NAME LOCAL_FIRE      LOCATION TOWNSHIP RANGE SECTION SUB_SECTIO
+## 1      DEER         16 HWY 87 MP 238    0080N 0100E      05         NW
+## 2 WEDNESDAY                             0070N 0130E      23       NWNE
+## 3    MAGGIE                             0070N 0050E       6         NW
+## 4     BIRCH                             0100N 0100E      31       SENW
+## 5                                                                     
+##            PRINCIPAL_ REPORT_UNI            REPORT_U_1 DISTRICT FIRE_NUMBE
+## 1 GILA AND SALT RIVER       0312 Tonto National Forest       06        174
+## 2 GILA AND SALT RIVER       0312 Tonto National Forest       05        219
+## 3 GILA AND SALT RIVER       0312 Tonto National Forest       01        081
+## 4 GILA AND SALT RIVER       0312 Tonto National Forest       04        099
+## 5          NEW MEXICO       0306  Gila National Forest       03        040
+##   ADMIN_UNIT            ADMIN_UN_1                 PROTECTING PROTECTION
+## 1       0312 Tonto National Forest USFS - USDA Forest Service           
+## 2       0312 Tonto National Forest USFS - USDA Forest Service           
+## 3       0312 Tonto National Forest USFS - USDA Forest Service           
+## 4       0312 Tonto National Forest USFS - USDA Forest Service           
+## 5       0306  Gila National Forest USFS - USDA Forest Service           
+##   PROTECTI_1          OWNERSHIP_ OWNERSHIP1 OWNERSHI_1 TOPO_LANDF STATE_CODE
+## 1            1 - National Forest                                          04
+## 2            1 - National Forest                                          04
+## 3            1 - National Forest                                          04
+## 4            1 - National Forest                                          04
+## 5            1 - National Forest                                          35
+##        STATE_NAME COUNTY COUNTY_NAM COUNTY_STA FIRE_MANAG POO_LATITU POO_LONGIT
+## 1    AZ - ARIZONA    007       Gila         04     P3BEY6   34.07250  -111.3578
+## 2    AZ - ARIZONA    007       Gila                P38601   33.95222  -110.9842
+## 3    AZ - ARIZONA    013   Maricopa                P38601   33.96861  -111.8833
+## 4    AZ - ARIZONA    007       Gila                P38601   34.25139  -111.3678
+## 5 NM - NEW MEXICO                           35              34.01667  -111.8333
+##   LAT_DEG LAT_MIN LAT_SEC LONG_DEG LONG_MIN LONG_SEC DISCOVER_Y   IGNITION
+## 1      34       4      21      111       21       28       2005 2005/08/14
+## 2      33      57       8      110       59        3       1999 1999/07/18
+## 3      33      58       7      111       53        0       1999 1999/05/24
+## 4      34      15       5      111       22        4       1999 1999/06/04
+## 5      34       1       0      111       50        0       1991 1991/06/05
+##    DISCOVERY INITIAL_RE                      FIRE_DETEC DISCOVERED
+## 1 2005/08/14 2005/08/14 45 -  Cooperator or Coop employ        DPS
+## 2 1999/07/21 1999/07/21             1 -  Agency Lookout           
+## 3 1999/05/24 1999/05/24                     0 -  Others           
+## 4 1999/06/04 1999/06/04                     0 -  Others           
+## 5 1991/06/06 1991/06/06             1 -  Agency Lookout           
+##           STATISTICA              INITIAL_ST STRATEGY_M OBJECTIVES COMPLEX_FI
+## 1 9 -  Miscellaneous             Suppression 2005/08/14                      
+## 2     1 -  Lightning             Suppression 1999/07/21                      
+## 3 9 -  Miscellaneous             Suppression 1999/05/24                      
+## 4      4 -  Campfire             Suppression 1999/06/04                      
+## 5     1 -  Lightning 3 - Control (1983-1998) 1991/06/06                      
+##   COMPLEX_NA CONTAINED   FIRE_OUT AGENCY_ACR OTHER_ACRE OTHER_AC_1 TOTAL_ACRE
+## 1                      2005/08/14        0.1          0          0        0.1
+## 2                      1999/07/30        2.0          0          0        2.0
+## 3                      1999/05/24        0.1          0          0        0.1
+## 4                      1999/06/04        0.1          0          0        0.1
+## 5                      1991/06/10        2.5          0          0        2.5
+##            FIRE_SIZE_ PRESCRIBED PRESCRIB_1 WUI_FIRE WUI_ACRES
+## 1  A -  .00-.25 Acres          N          0                  0
+## 2 B -  .26-9.99 Acres          N          0                  0
+## 3  A -  .00-.25 Acres          N          0                  0
+## 4  A -  .00-.25 Acres          N          0                  0
+## 5 B -  .26-9.99 Acres          N          0                  0
+##               FIRE_INTEN REP_WX_STA STATION_TY      STATION_NA WIND_SPEED
+## 1  1 - Flame Length 0-2&#39;      20604          0                          0
+## 2  1 - Flame Length 0-2&#39;      20603          4 PLEASANT VALLEY          0
+## 3 4 - Flame Length &gt;6-8&#39;      20604          0                          0
+## 4  1 - Flame Length 0-2&#39;      20603          4 PLEASANT VALLEY          0
+## 5 2 - Flame Length &gt;2-4&#39;     292005          4         RESERVE          0
+##                      NFDRS_FUEL OTHER_FUEL                         COVER_CLAS
+## 1 L - Western Perennial Grasses          0         11 - Grass-Low resist ctrl
+## 2    R - Hrdwd. Litter (Summer)          0 41 - Mixed conifer-Low resist ctrl
+## 3  B - Mature Brush (Chaparral)          0         52 - Brush-Med resist ctrl
+## 4        T - Sagebrush w/ Grass          0         11 - Grass-Low resist ctrl
+## 5               K - Light Slash          0                                  -
+##   SLOPE      ASPECT ELEVATION      LOCAL_TIME RECORD_ENT SUBMITTED_ APPROVED_D
+## 1     0      0 Flat      2500 America/Phoenix 2005/09/02 2005/09/02 2005/09/02
+## 2     0      7 West      6000 America/Phoenix 2000/04/25                      
+## 3     5 6 Southwest      3600 America/Phoenix 2000/04/19                      
+## 4     2      0 Flat      5200 America/Phoenix 2000/04/19                      
+## 5     5  9 Ridgetop      8500 America/Phoenix 1992/02/26                      
+##   CREATED_DA LAST_MODIF
+## 1 2005/09/02 2015/12/09
+## 2 2005/02/04 2015/12/09
+## 3 2005/02/04 2015/12/09
+## 4 2005/02/04 2015/12/09
+## 5 2005/02/04 2015/12/09</code></pre>
+<div id="initial-plotting" class="section level3">
+<h3>Initial Plotting</h3>
+<p>The fire points shapefile contains a column called “STATISTICA”, which contains the different classes of fire starts.</p>
+<p>Let’s go ahead and give our data some initial plotting.</p>
+<pre class="r"><code>terra::plot(fire, &quot;STATISTICA&quot;, plg=list(x=&quot;bottomleft&quot;, title = &quot;Ignition Cause&quot;), 
+            pax=list(las=1), main = &quot;Fire Starts&quot;)
+terra::plot(tonto, add = T)</code></pre>
+<p><img src="Point_Pattern_Analysis_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+</div>
+<div id="point-pattern-analysis---code" class="section level2">
+<h2>Point Pattern Analysis - Code</h2>
+<div id="observation-window---as.owin" class="section level3">
+<h3>Observation Window - as.owin()</h3>
+<p>as.owin() is the function for creating an “observation window” for point pattern analysis. Basically it creates the bounding box for which inside our analysis will take place.</p>
+<pre class="r"><code>terra::plot(tonto)</code></pre>
+<p><img src="Point_Pattern_Analysis_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>In our case, we want to look at point pattern analysis within Tonto National Forest. We will turn that polygon into our “owin”.</p>
+<hr />
+<pre class="r"><code>library(spatstat)
+tontoOwin &lt;- as.owin(sf::st_as_sf(tonto))
+class(tontoOwin)</code></pre>
+<pre><code>## [1] &quot;owin&quot;</code></pre>
+<p>NOTE: We brought in our shapefiles as spatvectors through the terra library. We must have our shapefile be an sf object to become an “owin”. Use st_as_sf() to change our spatvector to sf.</p>
+<hr />
+</div>
+<div id="ppp" class="section level3">
+<h3>ppp()</h3>
+<p>The function ppp() works on changing the coordinates of a dataset of points (our fire starts) into the class “ppp”. “ppp” represents a point pattern dataset in the two-dimensional plane.</p>
+<hr />
+<p>To create a “ppp” you must create a dataset that has only coordinates. We can do this by using crds() from the terra package.</p>
+<pre class="r"><code>pts &lt;- terra::crds(fire)
+head(pts)</code></pre>
+<pre><code>##             x       y
+## [1,] -1400789 1336513
+## [2,] -1369109 1317797
+## [3,] -1450217 1332942
+## [4,] -1398473 1356396
+## [5,] -1444803 1337477
+## [6,] -1427220 1287664</code></pre>
+<hr />
+<p>Now that we have our coordinates, we can develop our ppp by using the function and following syntax:</p>
+<hr />
+<p><strong>variable &lt;- ppp(point_dataset[,1], point_dataset[,2], window = tontoOwin)</strong></p>
+<hr />
+<p>[,1] &amp; [,2] refer to each column within our dataset (longitude and latitude) and the window refers to the observation window we created of the Tonto National Forest polygon.</p>
+<pre class="r"><code>p &lt;- ppp(pts[,1], pts[,2], window=tontoOwin) # define x and y point and window</code></pre>
+<pre><code>## Warning: data contain duplicated points</code></pre>
+<pre class="r"><code>p # what does this look like?</code></pre>
+<pre><code>## Planar point pattern: 8307 points
+## window: polygonal boundary
+## enclosing rectangle: [-1467940.3, -1330040.8] x [1234332.1, 1379166.6] units</code></pre>
+<pre class="r"><code>plot(p) # plots the ppp (points) and the window (boundary) together.</code></pre>
+<p><img src="Point_Pattern_Analysis_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="density" class="section level3">
+<h3>density()</h3>
+<p>density(), from the <em>stats</em> package (don’t worry, it’s already loaded for you in R by default), computed the kernel density estimates from a point pattern dataset (our “ppp”). Simply put in our “ppp” which is assigned to p.</p>
+<pre class="r"><code>ds &lt;- density(p)</code></pre>
+<hr />
+<p>If we check the class of “ds” we will see it is “im”.</p>
+<pre class="r"><code>class(ds)</code></pre>
+<pre><code>## [1] &quot;im&quot;</code></pre>
+<p>“im” represents a two-dimensional pixel image.</p>
+<p>–</p>
+</div>
+</div>
+<div id="plotting-point-density" class="section level2">
+<h2>Plotting Point Density</h2>
+<p>And as simple as that, we can plot the kernel density estimates for our point pattern of fire starts!</p>
+<pre class="r"><code>plot(ds, main=&#39;fire start density&#39;)</code></pre>
+<p><img src="Point_Pattern_Analysis_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<hr />
+<div id="plotting-multiple" class="section level3">
+<h3>Plotting Multiple</h3>
+<p>Below is some code for a for-loop that sets up a quick plot of 4 specific fire start causes. We will generate point density and test whether two of these have spatial relationships.</p>
+<p>For this example, We will examine fires caused by:</p>
+<ul>
+<li><p>Equipment Use</p></li>
+<li><p>Smoking</p></li>
+<li><p>Campfires</p></li>
+<li><p>Arson</p></li>
+</ul>
+<pre class="r"><code>par(mfrow=c(2,2))
+for (type in c(&quot;2 -  Equipment Use&quot;, &quot;3 -  Smoking&quot;, &quot;4 -  Campfire&quot;, &quot;7 -  Arson&quot;)) {
+  plot(tonto, col=&#39;grey&#39;)
+  fire_t &lt;- fire[fire$STATISTICA == type, ]
+  points(fire_t, col = &quot;red&quot;)
+  title(type)
+}</code></pre>
+<p><img src="Point_Pattern_Analysis_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+</div>
+<div id="multiple-point-patterns" class="section level2">
+<h2>Multiple Point Patterns</h2>
+<p>We can do the same process as above for all of the objects in the dataset at once by using <strong>marks =</strong> withon our ppp() function.</p>
+<p>The categories for fire starts are within the fire point dataset under the column <em>STATISTICA</em>. Since these categories are text and not factors, the ppp() function wont understand that they are really different categories of fire starts.</p>
+<p>We can produce a ppp class that has each category readily available to plot as a density.</p>
+<p>In our code below, lets make the fire categories a factor and then assign them to our marks =.</p>
+<pre class="r"><code># add in marks by using as.factor() around the column of interest.
+mpp &lt;- ppp(pts[,1], pts[,2], window = tontoOwin, marks=as.factor(fire$STATISTICA))</code></pre>
+<pre><code>## Warning: data contain duplicated points</code></pre>
+<div id="plot-multiple-point-patterns" class="section level3">
+<h3>Plot Multiple Point Patterns</h3>
+<p>Now lets plot the 4 point patterns of interest.</p>
+<pre class="r"><code>spp &lt;- split(mpp) # divides data into groups based upon marks = above
+
+plot(density(spp[c(2:4, 7)]), main=&#39;&#39;) # Plot Densities</code></pre>
+<p><img src="Point_Pattern_Analysis_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+</div>
+<div id="k-cross-function" class="section level2">
+<h2>K Cross Function</h2>
+<p>Now that we have generated point patterns for our fire starts, we can do a quick test to see if they is any clustering of two sets of patterns or to infer there is any relationship to their occurrences.</p>
+<p>Using the envelope() function, we will examine clustering between smoking are arson point patterns. The syntax is as follows:</p>
+<p>**variable &lt;- envelope(ppp variable, Kcross, nsim = # of choice, i = “variable 1”, j = “variable 2”)</p>
+<hr />
+<p>NOTE:</p>
+<ul>
+<li>nsim = Number of simulated point patterns to be generated when computing the envelopes</li>
+</ul>
+<hr />
+<p>Let’s plot:</p>
+<pre class="r"><code>ekc &lt;- envelope(mpp, Kcross, nsim = 5, i = &quot;3 -  Smoking&quot;, j = &quot;7 -  Arson&quot;)</code></pre>
+<pre><code>## Generating 5 simulations of CSR  ...
+## 1, 2,  [etd 3:22] 3,  [etd 2:56] 4,
+##  [etd 1:25]  5.
+## 
+## Done.</code></pre>
+<pre class="r"><code>plot(ekc, main = &quot;Smoking and Arson&quot;)</code></pre>
+<p><img src="Point_Pattern_Analysis_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<div id="interpretation" class="section level3">
+<h3>Interpretation</h3>
+<p>The dashed red line in our KCross plot represents the reference line for complete spatial randomness between the two point patterns.</p>
+<hr />
+<p>The grey line around the red line is the randomization envelope.</p>
+<hr />
+<p>The black line represent the Kcross function for these two point patterns.</p>
+<hr />
+<p>So our black line is quite a bit higher than the red dashed line. This gives us evidence that there is clustering of the two point patterns in this example.</p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

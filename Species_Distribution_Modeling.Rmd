@@ -1,0 +1,551 @@
+---
+title: "Species Distribution Modeling: Lecture & Coding Guide"
+author: "Josh Carrell - Utah State University, MS Ecology"
+date: "Last Update: `r format(Sys.time(), '%B %d, %Y')`"
+output:
+ html_document:
+    toc: true
+    toc_float:
+      toc_collapsed: true
+    toc_depth: 4
+    number_sections: False
+    theme: spacelab
+    code_folding: 'hide'
+    
+---
+
+## Species Distribution Modeling
+
+Species Distribution Modeling (SDM) is a dense topic. There are so many different algorithms to use and methods for model preparation. You can spend an entire career researching SDM, and many do. Here, we'll cover SDM flying high at 30,000 feet. 
+
+You'll be able to define SDM, understand it's importance in ecological and social studies, and be able to create a Generalized Linear Model from this tutorial.
+
+---
+
+SDM is the process of using species occurrence data (the observed x,y location of an organism) and predictor variables (climate, soils, topography) to predict the spatial distribution of a given species. 
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/sdm.png)
+
+Also known as Ecological Niche Modeling, Habitat Suitability Modeling, and range mapping, SDM is a common tool used in conservation biology and bioregional planning. 
+
+---
+
+### SDM Specifics
+
+SDM does not provide information on how many species are present in a location (abundance) or if a species is actually even there. SDM outputs are probability representations of habitat that is suitable for a given species. 
+
+SDM is a modeling effort to define suitable habitat. The goal of a model is to represent reality. However, all models are inherently "wrong". They can be useful and be powerful tools in ecology, but it is important to understand SDM has limitations. 
+
+---
+
+## Generalized Linear Model
+
+GLM "...can be applied in univariate and multivariate applications, and it is used to estimate an ecological response as a linear combination of independent predictor variables."
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/glm.jpg)
+
+## Model Requirements
+
+SDM require predictor variables (x) and a response variable (y). 
+
+---
+
+### Predictor Variables 
+
+Predictor variables are our explanatory variables. Based on occurrence location (the response variable) the predictor variables help explain and produce a predicted distribution of the species of interest. 
+
+For example, let's say there is a very green plant species that occurs on northern slopes, steep slopes, and at elevations higher than 500m.
+
+![Yes, this is a poorly drawn figure in microsoft paint](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/suitability.png)
+
+By using variables in elevation (occurs only above 500m) slope (occurs only on steep slopes) and aspect (occurs only on northern facing slopes) we can get a good idea of where that plant species will occur. However, an algorithm like GLM allows us to include many variables and examine their influence on habitat suitability computationally. 
+
+
+### Response Variable (Species Occurrence)
+
+The response variables guides the selection of variable importance in the distribution of a given species. By spatially overlaying the occurrence points of a species on the predictor variables, we can see which values are associated with each occurrence point. 
+
+---
+
+## Modeling
+
+### Blue Spruce - *Picea pungens*
+
+Our species of interest for this SDM example will be the state tree of Colorado, the Blue Spruce. Blue spruce is from the spruce family (Picea) and it's genus (pungens) is latin for "sharp", "biting, or "piercing". If you've ever come in contact with a blue spruce, you can understand why it would be named *pungens*. Very sharp needles. 
+
+Blue spruce is generally green.. but can look very blue due to a wax that reflects blue light on it's needles. Blue spruce can be found in the Southern Rockies at 6,000-10,000 feet but is also a commonly planted tree in yards and cities. For example, I have a small blue spruce in my front yard at ~4,600 feet. Seems to be doing just fine..
+
+They also make an excellent Christmas tree.
+
+![](D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/images/blue.jpg)
+
+---
+
+### Gathering Species Data via Spocc
+
+The spocc library is a "programmatic interface to many species occurrence data sources, including GBIF, USGS's BISON, iNaturalist, Berkeley Ecoinformatics Engine, eBird, iDigBio, VertNet, OBIS, and ALA. Includes functionality for retrieving species occurrence data, and combining that data."
+
+### occ()
+
+The occ() function is where we do all of our species occurrence data gathering. 
+
+First up, let's load the spocc package (install it if this is your first time!) and the sf package as well.
+
+```{r, message=FALSE}
+# Load libraries
+library(spocc) # data gathering
+library(sf)
+library(dplyr)
+library(PresenceAbsence)
+library(DAAG)
+library(raster)
+```
+
+--- 
+
+The first thing the occ() function requires is the binomial nomenclature for the species of interest (Genus species). I tend to place the names within another variable called spp.listA (species list name). 
+
+For this tutorial, we will be building models for the state tree of Colorado, the Blue Spruce (*Picea pungens*).
+
+Assign a variable of your choice to **c("Picea pungens")**
+
+```{r}
+
+spp.listA = c("Picea pungens") # replace Genus species
+
+```
+
+---
+
+Let's now use the occ() function query our newly assigned variable by using **"query = variable"**.
+
+We will also include all the databases that may contain occurrence data for the blue spruce be using **from = c("all the databases")**. I've included all the databases in the code below.
+
+Lastly, let's include a max limit on how many occurrences from each database we would like and make sure they have x,y coordinates assigned to them by using:
+
+**limit = #, has_coords = T**.
+
+Let's set a limit at 20,000.
+
+---
+
+Let's give it a shot below (This may take a while!):
+
+```{r, message=FALSE}
+#spp.occ <- occ(query = spp.listA, 
+#               from = c("gbif", "inat", "ecoengine", "vertnet", 
+#                        "bison", "ala", "idigbio", "obis"), # This will search #occurrences in these databases
+#               limit = 20000, has_coords = T) # Requiring data has coordinates
+
+```
+
+```{r}
+#spp.occRAW <- data.frame(occ2df(spp.occ))  # coerce to dataframe
+
+#pander::pander(head(spp.occRAW, 5)) 
+
+#dim(spp.occRAW)
+
+#pander::pander(table(spp.occRAW$prov)) # examine
+
+
+
+# save raw csv
+#write.csv(spp.occRAW, file = "D:/NR_6950/data/sdm_PIPU/spp.occRAW.csv")
+
+```
+
+
+
+```{r}
+pipu.occRAW <- read.csv("D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/sdm_PIPU/spp.occRAW.csv")
+pander::pander(head(pipu.occRAW, 5))
+```
+
+---
+
+
+## Predictors
+
+Now that we have our species occurrence data (which still needs some further manipulation.. save that for later) let's load our predictor variables using the terra package.
+
+```{r}
+preds <- terra::rast("D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/preds/predictors.tif")
+names(preds)
+terra::plot(preds)
+```
+
+```{r}
+terra::plot(preds$elevation, main = "1km Elevation of Colorado")
+```
+
+
+## Species Occurrence Organization
+
+Let;s organize our presence points and develop a few maps along the way.
+
+```{r}
+# Load species raw data
+spec.raw <- pipu.occRAW %>%                        # Load csv
+  na.omit(spec.raw) %>%                                           # omit NA values
+  st_as_sf(., coords = c("longitude","latitude"), crs = 4326)
+```
+
+### Colorado
+
+```{r}
+states <- sf::st_read("D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/sf_datasets/state.shp")
+
+Colorado <- states %>% 
+  filter(STATE == "Colorado")
+```
+
+### Species occurrences in Colorado
+
+```{r}
+pipu <- spec.raw
+pipu <- sf::st_crop(pipu, Colorado)
+plot(Colorado$geometry)
+plot(pipu$geometry, add = T)
+```
+### Pseudo-absences
+
+SDM often requires the use of species absence points. Just as presence points tell us which values for each predictor variable are useful in modeling a species distribution, absence tells us which values are not important. The use of absence allows us to define the overall habitat suitability of a species.
+
+This is a process known as an x-fold pseudo-absence process. Since we do not have field collected absence points, we generate random points across our modeling domain (the state of colorado). Since these points are random, we are "oversampling". Meaning, we are doubling the amount of presence points for our absence points due to the off chance that an absence point is a presence point in reality. 
+
+```{r}
+set.seed(1111) # change this value for each species!!!!!!!!!
+pipu.abs <- st_sample(st_geometry(Colorado), type = "random", size = (nrow(pipu)*2)) %>% 
+  st_sf() 
+plot(Colorado$geometry)
+plot(pipu.abs$geometry, add = T, col = "blue") # plot abs in blue inside buffer
+plot(pipu$geometry, add = T, col = "red") # pres on top in red
+
+```
+### Combining Presence and Absence
+
+```{r}
+abs.coords <- st_coordinates(pipu.abs) # coords of absence points
+pipu.abs <- cbind(abs.coords, pipu.abs) # bind coords and geometry
+pipu.abs$PA <- 0 # add absence 0 in PA column
+pipu.abs <- pipu.abs[c(1:2, 4, 3)] # organize columns
+
+```
+
+
+```{r}
+pres.coords <- sf::st_coordinates(pipu)
+head(pres.coords)
+head(pipu)
+
+pipu <- cbind(pres.coords, pipu)
+```
+
+```{r}
+head(pipu, 5)
+head(pipu.abs, 5)
+
+```
+
+```{r}
+pipu$PA <- 1 # give a 1 for presence
+names(pipu)
+pipu <- pipu[c(1:2, 9, 8)]
+
+# combine pres and abs
+pipu.PA <- rbind(pipu, pipu.abs) # combine 
+table(pipu.PA$PA) # examine PA
+head(pipu.PA, 5) # examine
+
+```
+
+### Train your data
+
+Data training is needed for predictive modeling. Here we are simply extracting the value of each predictor variable to each species absence and presence point. 
+
+```{r}
+
+names(preds)
+# Load species presence
+pipu.PA
+
+
+# extract predictors to species presence
+#PIAR.pres.fnetSF <- sf::st_crop(PIAR.pres.fnetSF, sky$geometry)
+#PIAR.presPA.SF <- sf::st_crop(PIAR.presabs, sky$geometry)
+spec.pres.sv <- as(pipu.PA, "SpatVector") # presence must be spatvector
+spec.pres.extract <- terra::extract(preds, spec.pres.sv) # perform extraction of preds to presence
+
+spec.trained.data <- cbind(spec.pres.extract, pipu.PA) # combine true pres, fnetids, and extracted preds
+head(spec.trained.data) # check
+spec.trained.data.max <- na.exclude(spec.trained.data)
+
+# organize
+names(spec.trained.data)
+spec.trained.data <- spec.trained.data[c(42, 2:4, 6:39)]
+```
+## Generalized Linear Modeling
+
+### Assign predictors
+
+```{r}
+# mod.LR pathway
+#path.LR <- "F:/Josh/Plants/spp/Mods/Mod.LR"
+#setwd(path.LR)
+
+#load("F:/Josh/Plants/spp/frames/bbox/spp.bbox.RDATA", verbose = T)
+
+# Load preds
+spp.preds <- preds
+
+
+# load presabs trained data
+#load("F:/Josh/Plants/spp/trained_data/spp.mod.vars.RData", verbose = T)
+dat1 <- spec.trained.data; dim(dat1); table(dat1$PA); head(dat1, 2) # examine data
+dat1 <- na.omit(dat1)
+
+```
+
+### Model formula setup
+
+```{r}
+
+# GLM Model Formula
+mod.form <- function(dat, r.col, p.col){
+  n.col <- ncol(dat) # Number of columns in the dataframe
+  resp <- colnames(dat[r.col]) # assign response a column name
+  pred <- colnames(dat[c(p.col:n.col)]) # assign preds column names
+  mod.formula <- as.formula(paste(resp,
+                                  "~", paste(pred, collapse = "+"))) # formula
+}
+
+```
+
+
+```{r}
+
+names(spec.trained.data) # names of predictors
+
+# Basic GLM with link = Binomial, dataframe = dat1
+mod1.LR <- glm(as.factor(PA) ~ elevation + slope + aspect +
+                 phave + phmax + frag3to10 + sieveno4 +
+                 sieveno10 + sieveno40 + sieveno200 +
+                 omr + dryweight + ksat + awc + wsat + sand + silt + clay +
+                 Bio1 + Bio2 + Bio3 + Bio4 + Bio5 + Bio6 + Bio7 + Bio8 +
+                 Bio9 + Bio10 + Bio11 + Bio12 + Bio13 + Bio14 + Bio15 + Bio16 + Bio17 +
+                 Bio18 + Bio19, 
+               family = binomial, data = dat1)
+
+# save mod1.LR
+#save(mod1.LR, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod1.LR.RData")
+
+# LR model 1 summary
+summary(mod1.LR)  
+
+# model 1 fit
+mod1.fit <- 100 * (1 - mod1.LR$deviance/mod1.LR$null.deviance) # model fit
+mod1.fit  # examine
+mod1.pred <- predict(mod1.LR, type = "response") # model prediction
+
+#save(mod1.pred, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod1.pred.LR.RData")
+
+# model 1 prediction
+head(mod1.pred) # examine prediction
+
+```
+
+
+## Modeling Metrics
+
+```{r}
+
+# LR model 2; backwards stepwise variable reduction
+mod2.LR <- step(mod1.LR, trace = F)
+
+# save mod2.LR
+#save(mod2.LR, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod2.LR.RData")
+
+# model 2 fit
+100 * (1 - mod2.LR$deviance/mod2.LR$null.deviance)
+# model 1 fit
+100 * (1 - mod1.LR$deviance/mod1.LR$null.deviance)
+
+# model 2 prediction
+mod2.pred <- predict(mod2.LR, type = "response")
+
+#save(mod2.pred, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod2.pred.LR.RData")
+
+# examine model predictions
+head(mod2.pred) # model 2
+head(mod1.pred) # model 1
+
+# model 2 summary
+summary(mod2.LR)
+
+# add var to keep track of model
+modl <- "mod2.LR"
+dat2 <- cbind(modl, dat1[1], mod2.pred) # build prediction df with mod2 preds
+
+# Create confusion matrix
+mod.cut <- optimal.thresholds(dat2, opt.methods = c("MaxKappa"))
+mod2.cfmat <- table(dat2[[2]],
+                    factor(as.numeric(dat2$mod2.pred >= mod.cut$mod2.pred)))
+mod2.cfmat # examine confusion matrix
+
+#save(mod.cut, file = "F:/Josh/Plants/spp/   Mods/Mod.LR/mod.cut.LR.RData") # save mod.cut
+#save(mod2.cfmat, file = "F:/Josh/Plants/spp/   Mods/Mod.LR/mod2.cfmat.LR.RData")
+
+# Model accuracies 
+mod2.acc <- presence.absence.accuracy(dat2, 
+                                      threshold = mod.cut$mod2.pred,
+                                      st.dev = F)
+tss <- mod2.acc$sensitivity + mod2.acc$specificity - 1 
+mod2.acc <- cbind(mod2.acc[1:7], tss) # bind metrics
+mod2.acc[c(1, 4:5, 7:8)] # examine accuracies
+
+#save(mod2.acc, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod2.acc.LR.RData")
+
+#windows(22,12)
+auc.roc.plot(dat2, color = T)
+#savePlot("auc.roc.plot.LR.jpeg", type = "jpeg")
+#dev.off()
+
+# Cross validation accuracies
+mod2.cv10 <- CVbinary(mod2.LR, nfolds = 5, print.details = F) # crossval
+ls(mod2.cv10)
+mod2.cv10.1 <- mod2.cv10$cvhat
+
+#save(mod2.cv10, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod2.cv10.RData")
+
+dat2 <- cbind(dat2, mod2.cv10.1)
+head(dat2)
+
+#save(dat2, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod.predictionframe.RData")
+
+# model CVbinary
+mod2.cfmatCV <- table(dat2[[2]], 
+                      factor(as.numeric(dat2$mod2.cv10.1 >= mod.cut$mod2.pred)))
+# examine both mod confusion matrices
+mod2.cfmatCV; mod2.cfmat
+#save(mod2.cfmatCV, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod2.cfmatCV.RData")
+
+# calculate accuracies with std.dev = F
+mod2.accB <- presence.absence.accuracy(dat2, 
+                                       threshold = mod.cut$mod2.pred, 
+                                       st.dev = F)
+tss <- mod2.accB$sensitivity + mod2.accB$specificity - 1 # code TSS metric
+mod2.accB <- cbind(mod2.accB[1:7], tss) # bind all metrics
+mod2.accB[c(1, 4:5, 7:8)] # examine accuracies
+#save(mod2.accB, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod2.accB.RData")
+
+
+
+```
+
+
+```{r}
+
+#save(mod2.acc, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod2.acc.LR.RData")
+
+
+auc.roc.plot(dat2, color = T)
+#savePlot("auc.roc.plot.LR.jpeg", type = "jpeg")
+dev.off()
+
+```
+
+```{r}
+
+# Cross validation accuracies
+mod2.cv10 <- CVbinary(mod2.LR, nfolds = 5, print.details = F) # crossval
+ls(mod2.cv10)
+mod2.cv10.1 <- mod2.cv10$cvhat
+
+#save(mod2.cv10, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod2.cv10.RData")
+
+dat2 <- cbind(dat2, mod2.cv10.1)
+head(dat2)
+
+#save(dat2, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod.predictionframe.RData")
+
+# model CVbinary
+mod2.cfmatCV <- table(dat2[[2]], 
+                      factor(as.numeric(dat2$mod2.cv10.1 >= mod.cut$mod2.pred)))
+# examine both mod confusion matrices
+mod2.cfmatCV; mod2.cfmat
+#save(mod2.cfmatCV, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod2.cfmatCV.RData")
+
+```
+
+
+```{r}
+
+# calculate accuracies with std.dev = F
+mod2.accB <- presence.absence.accuracy(dat2, 
+                                       threshold = mod.cut$mod2.pred, 
+                                       st.dev = F)
+tss <- mod2.accB$sensitivity + mod2.accB$specificity - 1 # code TSS metric
+mod2.accB <- cbind(mod2.accB[1:7], tss) # bind all metrics
+mod2.accB[c(1, 4:5, 7:8)] # examine accuracies
+#save(mod2.accB, file = "F:/Josh/Plants/spp/Mods/Mod.LR/mod2.accB.RData")
+
+```
+
+
+```{r}
+
+# view both cfmats in same AUC plot
+#windows(22,12)
+auc.roc.plot(dat2, color = T)
+#savePlot("auc.roc.plot.LR.BOTH.jpeg", type = "jpeg")
+
+```
+
+## Modeling Ouputs
+
+### Probability Model
+
+```{r}
+
+
+# spatial probability prediction
+spp.predsR <- as(preds, "Raster")
+modFprob.LR.1 <- predict(spp.predsR, mod1.LR, filename = "mod2.LRprob.tif", 
+                         type = "response", fun = predict, 
+                         index = 2, overwrite = T)
+
+
+```
+
+### CLassified on Model Threshold
+
+```{r}
+
+# classified prediction
+modFprobclas.R=reclassify(modFprob.LR.1,c(0,mod.cut[[2]],0,mod.cut[[2]],1,1))
+
+
+```
+
+### Classified Model Probability
+
+```{r}
+
+modFprobclas.bin.R <- reclassify(modFprob.LR.1,c(0,.2,1,
+                                                 .2,.4,2,
+                                                 .4,.6,3,
+                                                 .6,.8,4,
+                                                 0.8,1,5))
+
+
+```
+
+## Plot
+
+```{r}
+plot(modFprob.LR.1, main = "Probability Model")
+plot(modFprobclas.R, main = "Threshold Classification")
+plot(modFprobclas.bin.R, main = "Binned Probability")
+```
+

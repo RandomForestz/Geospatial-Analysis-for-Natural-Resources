@@ -1,0 +1,501 @@
+---
+title: "Introduction to Data Wrangling & Descriptive Statistics: Coding Guide"
+author: "Josh Carrell - Utah State University, MS Ecology"
+date: "Last Update: `r format(Sys.time(), '%B %d, %Y')`"
+output:
+ html_document:
+    toc: true
+    toc_float:
+      toc_collapsed: true
+    toc_depth: 4
+    number_sections: False
+    theme: spacelab
+    code_folding: 'hide'
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data
+
+For this week's coding guide (and assignment!) we are going to use data from several different sources. Some are not natural resource related but they are good datasets anyhow! 
+
+We'll be working with the following data for this coding guide and some for our assignments:
+
+1. Mental health survey of tech industry professionals. CSV format. Found in week 2 module for download.
+
+2. The iris dataset. Already pre-built in R.
+
+3. beaver1. This dataset comes from the **datasets** package.
+
+I'll show you how to load all this data as we go through the code below.
+
+---
+
+
+# Data Wrangling
+
+Data Wrangling is the process of cleaning and unifying messy and complex data sets for easy access and analysis. When working on a project with many stakeholders, our data often comes from various sources. This means you may be working with several data structuring formats, missing values, and incorrect information.
+
+We're going to walk through some of the very common methods and functions used for Data Wrangling.
+
+
+---
+
+## Explore the Data
+
+The data is in the week 2 module as "survey.csv".
+
+To load a csv in R, use the read.csv() function and direct R to load the data from a specific address in your files. See below in the code:
+
+```{r}
+survey <- read.csv("D:/R Textbook Template/NR6950 Notebook/NR 6950 Notebook/Data/DataWrangling/survey.csv") # Load data - this will be a different pathway for you.
+head(survey,5) # View first 5 rows of dataset using the head() function
+```
+
+
+Looking at the data above, it's pretty messy. It's also a very large dataset. It'd be easy to get lost just by scanning through this information in excel. Luckily R has a few build in function to make our lives easier when exploring the structure of newly acquired data.
+
+---
+
+### dim()
+
+The dim() function stands for dimensions and allows us to look at the dimensions of a dataset. 
+The results look like this: Number of Rows x Number of Columns. 
+
+```{r}
+dim(survey) # view dimensions
+```
+
+---
+
+### names()
+
+a simple function for looking at the column names of the dataset.
+
+```{r}
+names(survey)
+```
+
+--- 
+
+### head() and tail()
+
+Head and tail sounds like a horse shampoo. They're actually made for viewing the beginnings and endings of datasets. head() looking at the beginning; tail() looks at the end.
+
+Lets view the first 10 rows and the last 7 rows of our data. 
+
+```{r}
+head(survey, 10) # looks at first 10
+tail(survey, 7) # looks at last 7
+```
+
+
+---
+
+### str()
+
+str() stands for structure. This function allows to compactly display the structure of an R object, in this case our survey data. 
+
+Running str(survey) will give us the column names, the class type of each column (remember week 1) and the first few rows of data for each column. 
+
+```{r}
+str(survey)
+```
+
+---
+
+### is.na()
+
+is.na() stands for "are there any null/not available values in the data?". Using this function means we're just looking to see if anything is missing. If there is a missing value, the response will be TRUE. If there is a value, the response is FALSE.
+
+I wont run the code in this document but you will in your R script. 
+
+Run the following code in your R script: is.na(survey)
+
+What happened? It ran through the entire dataset responding to each cell whether it was null or had information. Pretty terrible to look at and not really helpful if we want to see how many null values or where those null values are. Luckily, table() helps us solve that.
+
+---
+
+### table()
+
+table() identifies the quantity of values in a given dataset and column. Let's run table() around our is.na() function on the survey data.
+
+```{r}
+table(is.na(survey))
+```
+
+Way freaking easier. There are 1892 missing values in our dataset.
+
+Lets use table() to check individual columns.
+
+```{r}
+table(is.na(survey$Age)) # checking age for NA's
+table(is.na(survey$comments)) # checking comments for NA's
+```
+
+So for age, there were zero rows left blank. How many blanks were left in the comments?
+
+NOTE: table() isn't only for finding NA's. This function allows you to see each row data per column and their quantity. Lets see the gender reponse of each survey participant.
+
+```{r}
+table(survey$Gender) # Gender responses
+length(unique(survey$Gender)) # code bonus: view how many unique responses there were.
+```
+There were quite a few different answers and some misspellings. We can use the tidyverse to work with that.
+
+--- 
+
+## Manipulate the Data
+
+For this section, we're going to use another dataset, **iris**. If you remember from week 1, we briefly used this dataset. To refresh yourself, feel free to code: ?iris
+
+---
+
+### The tidyverse
+
+We will be using what is called **the tidyverse**.
+
+The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures. - tidyverse.org
+
+You'll notice when you install and load the tidyverse packages, several packages will upload. Each package brings functions that are helpful in data science and data wrangling. 
+
+Let's install.
+
+```{r}
+# install.packages("tidyverse") # if never done before
+library(tidyverse) # load
+```
+
+---
+
+### dplyr
+
+dplyr is a package that makes part of the larger tidyverse. dplyr is a grammar of data manipulation, providing a consistent set of verbs that help you solve the most common data manipulation challenges. - https://dplyr.tidyverse.org/
+
+We will go through the major functions of dplyr.
+
+---
+
+### piping ( %>% )
+
+%>% is called the forward pipe operator. Essentially it means by using this symbol after a dataset, we want to directly add functions applied to that dataset. Pipes let you take the output of one function and send it directly to the next. 
+
+Pay attention to the code and look for the %>%. As we go througt the code it should be much more clear on how to use them. If not, please feel free to come to zoom hours or Google "piping in dplyr". 
+
+Note: a short cut to making the %>% symbol:
+
+- on windows: ctrl+shift+m
+
+- on mac: command+shift+m
+
+
+--- 
+
+### select()
+
+select() picks variables based on their names.
+
+Lets create a new variable called iris_select and let's say we only want to look at the following:
+
+- Species
+
+- Petal Length
+
+- Petal Width
+
+
+
+```{r}
+names(iris) # Call column names
+iris_select <- iris %>%              # create new variable from survey data,add pipe to add function
+  select(Species, Petal.Length, Petal.Width)# select() function. Select the specific columns of interest
+names(iris_select) # column names of newly created dataset of selected columns
+head(iris_select, 5) # check out the new data with 5 rows
+```
+
+We see that using the piping and the select function, we were able to create a new dataset with our desired columns directly from the survey dataset.
+
+---
+
+### mutate()
+
+mutate() allows for the creation of new variables that are functions of existing variables. Basically we can create new columns in our existing data based on conditions or equations from other columns.
+
+Lets create a new column in iris_select called Times.Bigger. This column should reflect how many times bigger in centimeters the petal length is than the petal width for each flower.
+
+```{r}
+iris_select <- iris %>% # Call from iris
+  select(Species, Petal.Length, Petal.Width) %>%    # Select our columns of interest
+  mutate(Times.Bigger = (Petal.Length/Petal.Width)) # Create new column, set = to condition/function
+
+names(iris_select) # Check names, notice the new column
+head(iris_select, 5) # Does the column look right? it worked!
+
+```
+
+
+
+
+### filter()
+
+filter() does exactly what it sounds like. This function allows us to filter through our dataset based on columns, values, and conditions. 
+
+For this example, lets use filter() to make a new dataset called setosa_small that is populated with only data of the setosa species with sepal lengths smaller than 5. 
+
+We can do this by running conditions inside the filter() function.
+
+To filter by specific value, use 2 equal signs (==) and set the column name to the value. In this case, Species will equal setosa (Species == "setosa"). NOTE: Since setosa is a character string, you must include quotation marks.
+
+To filter in a numeric condition, use a mathematical operator. In this case, we want sepal length less than 5 (Sepal.Length < 5). NOTE: Sepal length has numeric values, no quotations as it is not a character.
+
+**Lets run both conditions in the same function. String conditions together with the % symbol**.
+
+```{r}
+setosa_small <- iris %>%         # create from iris dataset
+  filter(Species == "setosa" & Sepal.Length < 5) # filter for species name and sepal length under 5
+
+setosa_small # view the new dataset
+```
+
+
+
+### summarise()
+
+summarise() creates a new data frame. It will have one (or more) rows for each combination of grouping variables; if there are no grouping variables, the output will have a single row summarising all observations in the input. It will contain one column for each grouping variable and one column for each of the summary statistics that you have specified. - https://dplyr.tidyverse.org/reference/summarise.html
+
+Basically summarise() allows us to view statistics of specific columns in a new dataset. You can use any of the descriptive statistic functions you will learn below in the Descriptive Statistics portion.
+
+let's make a new data frame called species_sepals that has the mean, max, and min values of sepal width.
+
+```{r}
+iris %>%  # call from iris data
+  summarise(mean(Sepal.Width), max(Sepal.Width), min(Sepal.Width)) # run functions, each will be new col.
+```
+
+How did it turn out? We got the values we needed but the values are for the whole dataset, not broken up by species. Let's use the group_by function.
+
+---
+
+### group_by()
+
+The group_by() function allows us to break up our dataset by a specific value. Above we wanted to see the mean, max, and min values of sepa width by species. We can use group_by(Species) for this to work.
+
+```{r}
+iris %>%  # call from iris data
+  group_by(Species) %>% 
+  summarise(mean(Sepal.Width), max(Sepal.Width), min(Sepal.Width)) # run functions, each will be new col.
+```
+
+---
+
+### arrange()
+
+arrange() allows us to rearrange our data based on certain conditions. Let's create a new dataset called virginica that contains only the virginica species, has sepal widths greater than 2.9, and is arranged in descending sepal lengths (we will use the desc() function).
+
+NOTE: desc() stands for descending. It will places the rows in descending order. 
+
+```{r}
+iris_new <- iris %>% # call from iris data
+  filter(Species == "virginica" & Sepal.Width > 2.9) %>% # filter species and sepal width
+  arrange(desc(Sepal.Length)) # arrange the data by descending values in sepal length
+
+iris_new # view the new data frame
+```
+
+
+---
+
+# Descriptive Statistics
+
+
+"Descriptive statistics are brief descriptive coefficients that summarize a given data set, which can be either a representation of the entire population or a sample of a population. Descriptive statistics are broken down into measures of central tendency and measures of variability (spread)" - The first thing to appear on google, www.investopedia.com
+
+Basically, descriptive statistics gives us quick snapshots of our data. R has loaded in functions (and a variety of packages to use) to generate simple and fast descriptive statistics. 
+
+## Data
+
+We're going to be using the beaver1 dataset from the datasets package. For more information, code ?beaver1 in your console or script after installing the package.
+
+```{r}
+# install.packages("datasets") # install if you never had used it before
+library(datasets)
+
+head(beaver1) # initial look
+```
+
+## Basic Statistics of base R
+
+R comes with a basic package for looking at descriptive statistics. The following functions are base functions meaning we don't need to load any packages, its already there.
+
+### mean()
+
+Calculates mean. 
+
+```{r}
+mean(beaver1$temp)
+```
+### min()
+
+Minimum value of dataset column or list.
+
+```{r}
+min(beaver1$temp)
+```
+
+### max
+
+Maximum value of dataset column or list.
+
+```{r}
+max(beaver1$temp)
+```
+
+### range()
+
+The range of values in a column or list. Code is also included for finding difference in range of numbers and working with square brackets.
+
+```{r}
+range(beaver1$temp) # returns minimum and max
+
+# If you would like to find the difference, run code below.
+range(beaver1$temp)[2] - range(beaver1$temp)[1] 
+
+# Notes: Range returns 2 values. If you have a list (just like the list of 2 values above), 
+# you can use square brackets [] to choose which value in the list you want to work with. 
+# So we can choose the max value [2 or the second value in list] and subtract the min value
+# [1 or the first value in list]. 
+
+# For more on square brackets: https://www.dataanalytics.org.uk/r-object-elements-brackets-double-brackets-and/
+```
+
+### median()
+
+Finds median of data column or list.
+
+```{r}
+median(beaver1$temp)
+```
+
+### quantile()
+
+Finds the indicated quantile. Quantile amount is in percent format (50% = 0.5)
+
+```{r}
+# 30 percent quantile
+quantile(beaver1$temp, 0.3)
+# 50 percent
+quantile(beaver1$temp, 0.5)
+```
+
+NOTE: You can also find the quantile of many values by including a list in the function. 
+```{r}
+numbers <- c(.25, .5, .75, .90) # I want these quantiles calculated
+quantile(beaver1$temp, numbers) # running function with numbers variable as condition
+```
+
+
+### sd() and var()
+
+sd() stands for standard deviation. var() stands for the variance.
+
+```{r}
+sd(beaver1$temp) # standard deviation
+
+var(beaver1$temp) # variance
+```
+
+### summary()
+
+summary() is best the bang for your buck and shows almost (except sd and variance) everything we have covered so far in one single function. You can run it on entire datasets.
+
+```{r}
+summary(beaver1)
+```
+
+### mode()
+
+mode() doesn't exist.. I'm not sure why but there are other ways to find this value through using table() and sort.
+
+```{r}
+sort(table(beaver1$temp), decreasing = TRUE)[1] # table() to find how many per value, sort() to sort!
+# then just select the first value (which should be our most occurring value based on a decreasing
+# sort) and use square brackets [1] to find the first value in the list.
+```
+
+
+## The psych package and describeBy()
+
+There are a few packages that do some great descriptive analyses but psych is awesome. Install pysch and we are going to use describeBy(). This function can give us most of the descriptive statistics we need in a few lines of code. It can save you some time!
+
+Let's view the descriptive statistics for each column in iris and group them by species.
+
+```{r}
+# install.packages("psych") # install if needed!
+library(psych)
+describeBy(iris, # define what data you will be using
+            group = iris$Species) # define how you want to group your statistics
+```
+
+
+## Basic Plots for Descriptive Statistics
+
+We will spend week 3 going over data visualization and I'll provide with several different ways to make some excellent graphs (and some maps! - that comes later too) but here are some simple ways to visualize your data.
+
+---
+
+### hist()
+
+Histograms give us insight into the spread of our data.
+
+```{r}
+hist(iris$Sepal.Length)
+```
+
+---
+
+### boxplot()
+
+Boxplots are very similar to histograms but can only measure the quantitative values of a qualitative variable. For example, we can look at the distribution of sepal lengths for each iris species.
+
+Boxplot code always follows this format: boxplot(quantitative variable ~ qualitative variable) or boxplot(y axis ~ x axis). 
+
+```{r}
+boxplot(iris$Sepal.Length ~ iris$Species) # first y axis then x axis
+```
+
+---
+
+
+### dotplot()
+
+Dotplots are very similar to boxplots only instead of boxes showing the spread of data, they show the actual value as a dot. Dotplots follow the same format as boxplots (y~x).
+
+You'll find dotplot() in the package: lattice. Install lattice and run a dotplot.
+
+```{r}
+# install.packages(lattice) # install lattice if never used before!
+library(lattice)
+dotplot(iris$Petal.Length ~ iris$Species)
+```
+
+---
+
+### scatterplots
+
+A scatterplot requires two quantitative variables and is used in linear regression to measure the relationships among variables. Scatterplots follow the same format as the other (y~x) but we only need to use the function, plot().
+
+```{r}
+plot(iris$Sepal.Length ~ iris$Sepal.Width)
+```
+
+
+
+## Done! 
+
+That was fairly long but I hope it helped you learn (or reinforce) some skills in getting to know your data. The week 2 assignment is in week 2 module. 
+
+As always, if you need any help feel free to contact me or come to the zoom office hours.
+
